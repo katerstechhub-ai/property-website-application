@@ -176,11 +176,13 @@ async function registerproperty(prevState, formData) {
         localStorage.setItem("my_properties", JSON.stringify(existing));
 
         console.log("✅ SAVED PROPERTY:", newProperty);
+        console.log(propertyId)
 
         return { success: true, errors: {} };
     } catch (err) {
         console.error("ERROR:", err);
         return { errors: { general: "Network error" } };
+        
     }
 }
 
@@ -258,8 +260,9 @@ export default function Create_property() {
                     <select
                         name="status"
                         className="w-full p-3 border border-gray-300 rounded bg-white text-black"
-                        defaultValue="AVAILABLE"
+                        defaultValue="Property Status"
                     >
+                        <option value="">Property Status</option>
                         <option value="AVAILABLE">AVAILABLE</option>
                         <option value="SOLD">SOLD</option>
                     </select>

@@ -102,7 +102,7 @@ export default function ViewProperty() {
       </h1>
 
       {/* GRID */}
-      <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-8">
+      <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-8">
         {properties.map((property, index) => {
           const image =
             property?.images?.[0]?.url ||

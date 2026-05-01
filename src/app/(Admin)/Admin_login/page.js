@@ -67,7 +67,7 @@ export default function CreateMerchant() {
     useEffect(() => {
         if (state?.success) {
             const timer = setTimeout(() => {
-                router.push("/dashboard"); // ✅ now active
+                router.push("/Dashboard"); // ✅ now active
             }, 1500);
             return () => clearTimeout(timer);
         }
