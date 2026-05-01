@@ -158,13 +158,31 @@ export default function PublicHome() {
         return matchesFilter && matchesSearch && matchesCity;
     });
 
-    const featuredProperties = properties.filter(p => p.featured);
-
     const steps = [
-        { icon: MagnifyingGlassIcon, title: "Search", desc: "Find properties that match your criteria" },
-        { icon: IdentificationIcon, title: "Contact", desc: "Reach out to agents or owners" },
-        { icon: HomeIcon, title: "Visit", desc: "Schedule viewings of your favorites" },
-        { icon: BuildingOfficeIcon, title: "Close Deal", desc: "Finalize your dream property" }
+        {
+            number: "01",
+            title: "Search",
+            desc: "Browse thousands of verified properties by location, price, or type.",
+            image: "https://images.pexels.com/photos/7821702/pexels-photo-7821702.jpeg?auto=compress&cs=tinysrgb&w=600"
+        },
+        {
+            number: "02",
+            title: "Contact Agent",
+            desc: "Connect directly with trusted agents — no middlemen, no hidden charges.",
+            image: "https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=600"
+        },
+        {
+            number: "03",
+            title: "Visit Property",
+            desc: "Schedule a viewing at your convenience and inspect your favourite listings.",
+            image: "https://images.pexels.com/photos/1396132/pexels-photo-1396132.jpeg?auto=compress&cs=tinysrgb&w=600"
+        },
+        {
+            number: "04",
+            title: "Close the Deal",
+            desc: "Finalise your purchase or rental with full documentation support.",
+            image: "https://images.pexels.com/photos/3943716/pexels-photo-3943716.jpeg?auto=compress&cs=tinysrgb&w=600"
+        }
     ];
 
     const testimonials = [
@@ -173,7 +191,6 @@ export default function PublicHome() {
         { name: "Michael Okafor", role: "First-time Buyer", text: "The process was smooth and hassle-free. Thank you!", rating: 4 }
     ];
 
-    // Project data
     const projects = [
         { name: "PARAMOUNT TWIN TOWERS", location: "Oniru, Victoria Island", price: "₦720,000,000", status: "CURRENTLY SELLING", unit: "2 BEDROOM PREMIUM UNIT", image: "https://images.pexels.com/photos/258154/pexels-photo-258154.jpeg?auto=compress&cs=tinysrgb&w=800" },
         { name: "CERULEAN TOWERS", location: "Water Corporation Rd, Victoria Island", price: "₦850,000,000", status: "COMING SOON", unit: "3 BEDROOM LUXURY UNIT", image: "https://images.pexels.com/photos/276724/pexels-photo-276724.jpeg?auto=compress&cs=tinysrgb&w=800" },
@@ -282,29 +299,50 @@ export default function PublicHome() {
                 </div>
             </div>
 
-            {/* How It Works Section */}
-            <div className="relative py-16 overflow-hidden">
-                <div className="absolute inset-0 bg-gray-50"><div className="absolute top-0 right-0 w-96 h-96 bg-blue-100 rounded-full opacity-20 -translate-y-1/2 translate-x-1/2"></div><div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-100 rounded-full opacity-20 translate-y-1/2 -translate-x-1/2"></div></div>
-                <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-12">
-                        <div className="inline-flex items-center gap-2 bg-blue-100 rounded-full px-4 py-1 mb-4"><SparklesIcon className="w-4 h-4 text-blue-600" /><span className="text-sm text-blue-600 font-medium">Simple Process</span></div>
+            {/* ─── HOW IT WORKS ─── */}
+            <div className="bg-white py-20">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    {/* Header */}
+                    <div className="text-center mb-14">
+                        <div className="inline-flex items-center gap-2 bg-blue-100 rounded-full px-4 py-1 mb-4">
+                            <SparklesIcon className="w-4 h-4 text-blue-600" />
+                            <span className="text-sm text-blue-600 font-medium">Simple Process</span>
+                        </div>
                         <h2 className="text-3xl font-bold text-gray-900 mb-3">How It Works</h2>
-                        <p className="text-gray-600">Your journey to finding the perfect property in 4 easy steps</p>
+                        <p className="text-gray-500 max-w-xl mx-auto">Your journey to finding the perfect property in 4 easy steps</p>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+
+                    {/* Steps */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                         {steps.map((step, index) => (
-                            <div key={index} className="text-center group">
-                                <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:scale-110 transition duration-300"><step.icon className="w-8 h-8 text-white" /></div>
-                                <h3 className="text-xl font-semibold mb-2">Step {index + 1}: {step.title}</h3>
-                                <p className="text-gray-500 text-sm">{step.desc}</p>
+                            <div key={index} className="group">
+                                {/* Image */}
+                                <div className="relative overflow-hidden  mb-5 shadow-md">
+                                    <img
+                                        src={step.image}
+                                        alt={step.title}
+                                        className="w-full h-52 object-cover "
+                                    />
+                                    {/* Step number badge */}
+                                    <div className="absolute top-4 left-4 w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center font-bold text-sm shadow-lg">
+                                        {step.number}
+                                    </div>
+                                    {/* Connector line (hidden on last) */}
+                                    {index < steps.length - 1 && (
+                                        <div className="hidden lg:block absolute top-1/2 -right-4 w-8 h-0.5 bg-blue-200 z-10" />
+                                    )}
+                                </div>
+                                {/* Text */}
+                                <h3 className="text-lg font-bold text-gray-900 mb-1">{step.title}</h3>
+                                <p className="text-gray-500 text-sm leading-relaxed">{step.desc}</p>
                             </div>
                         ))}
                     </div>
                 </div>
             </div>
 
-            {/* Premium Projects Section - Split Layout like Palton Morgan */}
-            <div className="bg-white py-20">
+            {/* Premium Projects Section */}
+            <div className="bg-gray-50 py-20">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="grid md:grid-cols-2 gap-12 items-center">
                         <div className="relative h-[500px] overflow-hidden shadow-xl">
@@ -342,8 +380,8 @@ export default function PublicHome() {
                 </div>
             </div>
 
-            {/* Our Projects Section - Simple Grid (no hover, no rounded corners) */}
-            <div className="bg-gray-50 py-20">
+            {/* Our Projects Grid */}
+            <div className="bg-white py-20">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-12">
                         <p className="text-blue-600 text-sm font-semibold mb-2">OUR PORTFOLIO</p>

@@ -36,6 +36,13 @@ export default function TenantDashboard() {
             return;
         }
         const parsed = JSON.parse(userData);
+
+        // Role guard — block MERCHANT (admin) from accessing tenant dashboard
+        if (parsed.role === "MERCHANT") {
+            router.push("/tenant/login");
+            return;
+        }
+
         setUser(parsed);
         fetchData(parsed);
     }, []);
@@ -196,10 +203,9 @@ export default function TenantDashboard() {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            {/* Hero Section with Background Image */}
+            {/* Hero Section */}
             <div className="relative overflow-hidden">
-                {/* Background Image */}
-                <div 
+                <div
                     className="absolute inset-0 bg-cover bg-center"
                     style={{
                         backgroundImage: "url('https://images.pexels.com/photos/280221/pexels-photo-280221.jpeg?auto=compress&cs=tinysrgb&w=1600')"
@@ -207,8 +213,7 @@ export default function TenantDashboard() {
                 >
                     <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/60 to-black/70"></div>
                 </div>
-                
-                {/* Content */}
+
                 <div className="relative max-w-7xl mx-auto px-4 py-8">
                     <div className="flex flex-wrap justify-between items-center gap-4">
                         <div className="flex items-center gap-4">
@@ -223,13 +228,23 @@ export default function TenantDashboard() {
                                 </p>
                             </div>
                         </div>
-                        <button
-                            onClick={handleLogout}
-                            className="flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur border border-white/20 text-white px-4 py-2 rounded-xl text-sm font-medium transition"
-                        >
-                            <ArrowRightOnRectangleIcon className="w-4 h-4" />
-                            Logout
-                        </button>
+
+                        {/* Action buttons — Browse + Logout */}
+                        <div className="flex gap-3">
+                            <Link href="/public">
+                                <button className="flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur border border-white/20 text-white px-4 py-2 rounded-xl text-sm font-medium transition">
+                                    <HomeIcon className="w-4 h-4" />
+                                    Browse Properties
+                                </button>
+                            </Link>
+                            <button
+                                onClick={handleLogout}
+                                className="flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur border border-white/20 text-white px-4 py-2 rounded-xl text-sm font-medium transition"
+                            >
+                                <ArrowRightOnRectangleIcon className="w-4 h-4" />
+                                Logout
+                            </button>
+                        </div>
                     </div>
 
                     {/* Stats Cards */}
@@ -255,7 +270,6 @@ export default function TenantDashboard() {
                 </div>
             </div>
 
-            {/* Rest of the dashboard remains the same */}
             <div className="max-w-7xl mx-auto px-4 py-6">
                 {/* Tabs */}
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 mb-6 overflow-hidden">
@@ -266,11 +280,10 @@ export default function TenantDashboard() {
                                 <button
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id)}
-                                    className={`flex items-center gap-2 px-6 py-4 font-medium text-sm whitespace-nowrap transition border-b-2 ${
-                                        activeTab === tab.id
-                                            ? "border-blue-600 text-blue-600 bg-blue-50"
-                                            : "border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50"
-                                    }`}
+                                    className={`flex items-center gap-2 px-6 py-4 font-medium text-sm whitespace-nowrap transition border-b-2 ${activeTab === tab.id
+                                        ? "border-blue-600 text-blue-600 bg-blue-50"
+                                        : "border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+                                        }`}
                                 >
                                     <Icon className="w-4 h-4" />
                                     {tab.label}
@@ -553,7 +566,13 @@ export default function TenantDashboard() {
                                         </p>
                                     </div>
                                 </div>
-                                <div className="pt-2">
+                                <div className="pt-2 flex flex-col gap-3">
+                                    <Link href="/public">
+                                        <button className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-medium transition">
+                                            <HomeIcon className="w-5 h-5" />
+                                            Browse Properties
+                                        </button>
+                                    </Link>
                                     <button
                                         onClick={handleLogout}
                                         className="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white py-3 rounded-xl font-medium transition"

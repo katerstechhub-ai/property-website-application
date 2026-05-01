@@ -11,13 +11,11 @@ import {
     PhotoIcon,
     XMarkIcon,
     CheckCircleIcon,
-    UserGroupIcon,
     SparklesIcon,
     ArrowUpTrayIcon,
 } from "@heroicons/react/24/outline";
 
 const BASE = "http://property.reworkstaging.name.ng/v1";
-const getAgentId = (a) => a?._id || a?.id || null;
 
 // Toast Component
 function Toast({ message, type, onClose }) {
@@ -89,13 +87,13 @@ const compressImage = (file, maxSizeKB = 500) => {
     });
 };
 
-export default function AdminCreateProperty() {
+export default function AgentCreateProperty() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState(false);
-    const [agents, setAgents] = useState([]);
     const [toast, setToast] = useState(null);
+    const [agentId, setAgentId] = useState(null);
 
     // Image state
     const [imageFiles, setImageFiles] = useState([]);
@@ -122,7 +120,6 @@ export default function AdminCreateProperty() {
         parking_space: 0,
         total_area: "",
         amenities: [],
-        agent: ""
     });
     const [amenitiesInput, setAmenitiesInput] = useState("");
 
@@ -130,7 +127,19 @@ export default function AdminCreateProperty() {
         setToast({ message, type });
     };
 
-    useEffect(() => { fetchAgents(); }, []);
+    useEffect(() => {
+        // Get agent ID from logged in user
+        const userData = localStorage.getItem("user");
+        if (!userData) {
+            router.push("/agent/login");
+            return;
+        }
+        const user = JSON.parse(userData);
+        const id = user?.id || user?._id;
+        if (id) {
+            setAgentId(id);
+        }
+    }, [router]);
 
     // Cleanup object URLs on unmount
     useEffect(() => {
@@ -142,22 +151,6 @@ export default function AdminCreateProperty() {
             });
         };
     }, [imagePreviews]);
-
-    const fetchAgents = async () => {
-        try {
-            const token = localStorage.getItem("token");
-            const res = await fetch(`${BASE}/merchants/agents`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            const data = await res.json();
-            const list = Array.isArray(data.data) ? data.data : Array.isArray(data) ? data : [];
-            setAgents(list.map(a => ({
-                _id: getAgentId(a),
-                full_name: a.full_name || a.name || "Unknown",
-                company: a.company || ""
-            })));
-        } catch {}
-    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -257,6 +250,11 @@ export default function AdminCreateProperty() {
             return;
         }
         
+        if (!agentId) {
+            showToast("Agent ID not found. Please login again.", "error");
+            return;
+        }
+        
         setLoading(true);
         setError("");
 
@@ -281,9 +279,8 @@ export default function AdminCreateProperty() {
             parking_space: formData.parking_space,
             total_area: formData.total_area,
             amenities: formData.amenities,
+            agent: agentId
         };
-
-        if (formData.agent?.trim()) submitData.agent = formData.agent.trim();
 
         try {
             const res = await fetch(`${BASE}/properties`, {
@@ -308,7 +305,7 @@ export default function AdminCreateProperty() {
 
                 setSuccess(true);
                 showToast("Property created successfully! Redirecting...", "success");
-                setTimeout(() => router.push("/admin/properties"), 2500);
+                setTimeout(() => router.push("/agent/properties"), 2500);
             } else {
                 showToast(data.message || data.msg || "Failed to create property.", "error");
             }
@@ -320,14 +317,14 @@ export default function AdminCreateProperty() {
         }
     };
 
-    const categories = ["FLAT", "APPARTMENT", "LAND", "DUPLEX", "WAREHOUSE", "SHOP", "VILLA", "COMMERCIAL"];
+    const categories = ["FLAT", "APARTMENT", "LAND", "DUPLEX", "WAREHOUSE", "SHOP", "VILLA", "COMMERCIAL"];
     const types = ["RENT", "SALES", "LEASE"];
     const paymentPlans = ["PER_ANNUM", "MONTHLY", "PER_PLOT", "PER_DAY"];
     const furnishingOptions = ["FURNISHED", "UNFURNISHED", "SEMI_FURNISHED"];
     const propertyUses = ["RESIDENTIAL", "COMMERCIAL"];
 
-    const inputClass = "w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-sm bg-white transition";
-    const selectClass = "w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-sm bg-white appearance-none transition";
+    const inputClass = "w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none text-sm bg-white transition";
+    const selectClass = "w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none text-sm bg-white appearance-none transition";
 
     return (
         <div className="min-h-screen bg-gray-50 py-8">
@@ -335,17 +332,17 @@ export default function AdminCreateProperty() {
             
             <div className="max-w-4xl mx-auto px-4">
                 <div className="mb-8">
-                    <Link href="/admin/properties" className="inline-flex items-center text-emerald-600 hover:text-emerald-700 text-sm font-medium mb-4 group transition">
+                    <Link href="/agent/properties" className="inline-flex items-center text-purple-600 hover:text-purple-700 text-sm font-medium mb-4 group transition">
                         <ArrowLeftIcon className="w-4 h-4 mr-1 group-hover:-translate-x-0.5 transition" />
                         Back to Properties
                     </Link>
                     <div className="flex items-center gap-3 mb-2">
-                        <div className="w-12 h-12 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center shadow-lg">
+                        <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-violet-500 rounded-2xl flex items-center justify-center shadow-lg">
                             <PlusCircleIcon className="w-6 h-6 text-white" />
                         </div>
                         <div>
                             <h1 className="text-3xl font-bold text-gray-900">Create New Property</h1>
-                            <p className="text-gray-500 mt-1">Add a new property listing to the platform</p>
+                            <p className="text-gray-500 mt-1">Add a new property listing as an agent</p>
                         </div>
                     </div>
                 </div>
@@ -360,21 +357,14 @@ export default function AdminCreateProperty() {
                     </div>
                 )}
 
-                {error && (
-                    <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-5 py-4 rounded-2xl flex items-start gap-3">
-                        <span className="shrink-0">⚠️</span>
-                        <span className="text-sm">{error}</span>
-                    </div>
-                )}
-
                 <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-                    <div className="h-2 bg-gradient-to-r from-emerald-500 via-teal-500 to-green-500" />
+                    <div className="h-2 bg-gradient-to-r from-purple-500 via-violet-500 to-purple-500" />
                     <div className="p-6 space-y-8">
 
                         {/* Basic Info */}
                         <div>
                             <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                                <HomeIcon className="w-5 h-5 text-emerald-500" /> Basic Information
+                                <HomeIcon className="w-5 h-5 text-purple-500" /> Basic Information
                             </h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
@@ -391,7 +381,7 @@ export default function AdminCreateProperty() {
                         {/* Location */}
                         <div>
                             <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                                <MapPinIcon className="w-5 h-5 text-emerald-500" /> Location
+                                <MapPinIcon className="w-5 h-5 text-purple-500" /> Location
                             </h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
@@ -412,7 +402,7 @@ export default function AdminCreateProperty() {
                         {/* Property Details */}
                         <div>
                             <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                                <BuildingOfficeIcon className="w-5 h-5 text-emerald-500" /> Property Details
+                                <BuildingOfficeIcon className="w-5 h-5 text-purple-500" /> Property Details
                             </h2>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                 <div>
@@ -478,48 +468,23 @@ export default function AdminCreateProperty() {
                             <textarea name="description" required value={formData.description} onChange={handleChange} rows="4" className={inputClass} placeholder="Describe the property in detail..." />
                         </div>
 
-                        {/* Assign Agent */}
-                        <div>
-                            <h2 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
-                                <UserGroupIcon className="w-5 h-5 text-emerald-500" /> Assign to Agent
-                            </h2>
-                            {agents.length === 0 ? (
-                                <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-700 flex items-center gap-2">
-                                    <span>⚠️</span>
-                                    <span>No agents found. <Link href="/admin/agents/create" className="font-semibold underline hover:text-amber-900">Create an agent first.</Link></span>
-                                </div>
-                            ) : (
-                                <>
-                                    <select name="agent" value={formData.agent} onChange={handleChange} className={`${selectClass} max-w-md`}>
-                                        <option value="">-- Select an agent (optional) --</option>
-                                        {agents.map(agent => (
-                                            <option key={agent._id} value={agent._id}>
-                                                {agent.full_name}{agent.company ? ` (${agent.company})` : ""}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    <p className="text-xs text-gray-400 mt-1">{agents.length} agent{agents.length !== 1 ? "s" : ""} available</p>
-                                </>
-                            )}
-                        </div>
-
                         {/* Amenities */}
                         <div>
                             <h2 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
-                                <SparklesIcon className="w-5 h-5 text-emerald-500" /> Amenities
+                                <SparklesIcon className="w-5 h-5 text-purple-500" /> Amenities
                             </h2>
                             <div className="flex gap-2 mb-3">
                                 <input type="text" value={amenitiesInput} onChange={e => setAmenitiesInput(e.target.value)}
-                                    className="flex-1 px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none text-sm"
+                                    className="flex-1 px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none text-sm"
                                     placeholder="e.g., SWIMMING_POOL, GYM, PARKING"
                                     onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addAmenity(); } }} />
                                 <button type="button" onClick={addAmenity} className="px-5 py-2 bg-gray-700 hover:bg-gray-800 text-white rounded-xl transition text-sm font-medium">Add</button>
                             </div>
                             <div className="flex flex-wrap gap-2">
                                 {formData.amenities.map((amenity, idx) => (
-                                    <span key={idx} className="bg-emerald-100 text-emerald-700 px-3 py-1.5 rounded-xl text-sm flex items-center gap-2">
+                                    <span key={idx} className="bg-purple-100 text-purple-700 px-3 py-1.5 rounded-xl text-sm flex items-center gap-2">
                                         {amenity}
-                                        <button type="button" onClick={() => removeAmenity(amenity)} className="hover:text-emerald-900 font-bold">×</button>
+                                        <button type="button" onClick={() => removeAmenity(amenity)} className="hover:text-purple-900 font-bold">×</button>
                                     </span>
                                 ))}
                             </div>
@@ -528,11 +493,11 @@ export default function AdminCreateProperty() {
                         {/* Images Section */}
                         <div>
                             <h2 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                                <PhotoIcon className="w-5 h-5 text-emerald-500" /> Property Images
+                                <PhotoIcon className="w-5 h-5 text-purple-500" /> Property Images
                             </h2>
                             
                             <div>
-                                <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-emerald-400 transition hover:bg-emerald-50/30">
+                                <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-purple-400 transition hover:bg-purple-50/30">
                                     <PhotoIcon className="w-12 h-12 text-gray-400 mx-auto mb-3" />
                                     <p className="text-gray-500 mb-2">Click to upload property images</p>
                                     <p className="text-xs text-gray-400 mb-4">Up to 5 images (JPG, PNG, WEBP)</p>
@@ -545,7 +510,7 @@ export default function AdminCreateProperty() {
                                         id="image-upload"
                                     />
                                     <label htmlFor="image-upload"
-                                        className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition cursor-pointer shadow-sm">
+                                        className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-500 hover:to-violet-500 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition cursor-pointer shadow-sm">
                                         <ArrowUpTrayIcon className="w-4 h-4" /> Select Images
                                     </label>
                                 </div>
@@ -559,7 +524,7 @@ export default function AdminCreateProperty() {
                                                     <img 
                                                         src={preview} 
                                                         alt={`Preview ${idx + 1}`}
-                                                        className="w-full h-24 object-cover rounded-lg border-2 border-gray-200 shadow-sm group-hover:border-emerald-400 transition"
+                                                        className="w-full h-24 object-cover rounded-lg border-2 border-gray-200 shadow-sm group-hover:border-purple-400 transition"
                                                     />
                                                     <button 
                                                         type="button" 
@@ -581,7 +546,7 @@ export default function AdminCreateProperty() {
                             <button
                                 type="submit"
                                 disabled={loading || success || uploading}
-                                className="flex-1 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white py-3 rounded-xl font-semibold transition flex items-center justify-center gap-2 disabled:opacity-50 shadow-md"
+                                className="flex-1 bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-500 hover:to-violet-500 text-white py-3 rounded-xl font-semibold transition flex items-center justify-center gap-2 disabled:opacity-50 shadow-md"
                             >
                                 {uploading ? (
                                     <><div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" /> {uploadStatus || "Uploading..."}</>
@@ -591,7 +556,7 @@ export default function AdminCreateProperty() {
                                     <><PlusCircleIcon className="w-5 h-5" /> Create Property</>
                                 )}
                             </button>
-                            <Link href="/admin/properties" className="flex-1">
+                            <Link href="/agent/properties" className="flex-1">
                                 <button type="button" className="w-full border-2 border-gray-200 text-gray-600 hover:bg-gray-50 py-3 rounded-xl font-semibold transition">Cancel</button>
                             </Link>
                         </div>

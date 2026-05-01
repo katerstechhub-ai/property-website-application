@@ -20,6 +20,8 @@ import {
     ArrowPathIcon
 } from "@heroicons/react/24/outline";
 
+const getId = (obj) => obj?._id || obj?.id || null;
+
 export default function AdminDashboard() {
     const router = useRouter();
     const [stats, setStats] = useState({
@@ -37,66 +39,100 @@ export default function AdminDashboard() {
 
     useEffect(() => {
         const userData = localStorage.getItem("user");
-        if (!userData) { 
-            router.push("/admin/login"); 
-            return; 
-        }
+        if (!userData) { router.push("/admin/login"); return; }
         try {
             const user = JSON.parse(userData);
+            if (user.role !== "MERCHANT") { router.push("/admin/login"); return; }
             const name = user.full_name || user.first_name || "Admin";
             setAdminName(name);
             setTempName(name);
-        } catch (e) {}
+        } catch {
+            router.push("/admin/login"); return;
+        }
         fetchAdminData();
     }, []);
 
     const fetchAdminData = async () => {
         const token = getToken();
-        if (!token) {
-            setLoading(false);
-            return;
-        }
-        
+        if (!token) { setLoading(false); return; }
+
         try {
-            const [usersRes, agentsRes, propsRes, aptRes, reviewsRes] = await Promise.all([
-                fetch("http://property.reworkstaging.name.ng/v1/users?limit=100", { 
-                    headers: { "Authorization": `Bearer ${token}` } 
+            const userData = JSON.parse(localStorage.getItem("user") || "{}");
+            const myId = userData.id || userData._id;
+
+            const [usersRes, agentsRes, aptRes, reviewsRes] = await Promise.all([
+                fetch("http://property.reworkstaging.name.ng/v1/users?limit=100", {
+                    headers: { Authorization: `Bearer ${token}` }
                 }),
-                fetch("http://property.reworkstaging.name.ng/v1/agents", { 
-                    headers: { "Authorization": `Bearer ${token}` } 
+                fetch("http://property.reworkstaging.name.ng/v1/merchants/agents", {
+                    headers: { Authorization: `Bearer ${token}` }
                 }),
-                fetch("http://property.reworkstaging.name.ng/v1/properties", { 
-                    headers: { "Authorization": `Bearer ${token}` } 
+                fetch("http://property.reworkstaging.name.ng/v1/appointments", {
+                    headers: { Authorization: `Bearer ${token}` }
                 }),
-                fetch("http://property.reworkstaging.name.ng/v1/appointments", { 
-                    headers: { "Authorization": `Bearer ${token}` } 
-                }),
-                fetch("http://property.reworkstaging.name.ng/v1/reviews", { 
-                    headers: { "Authorization": `Bearer ${token}` } 
+                fetch("http://property.reworkstaging.name.ng/v1/reviews", {
+                    headers: { Authorization: `Bearer ${token}` }
                 })
             ]);
 
-            const [usersData, agentsData, propsData, aptData, reviewsData] = await Promise.all([
-                usersRes.json(), agentsRes.json(), propsRes.json(), aptRes.json(), reviewsRes.json()
+            const [usersData, agentsData, aptData, reviewsData] = await Promise.all([
+                usersRes.json(),
+                agentsRes.json(),
+                aptRes.json(),
+                reviewsRes.json()
             ]);
 
-            // Get agents count - handle different response structures
-            let agentsCount = 0;
-            if (agentsData.data && Array.isArray(agentsData.data)) {
-                agentsCount = agentsData.data.length;
-            } else if (Array.isArray(agentsData)) {
-                agentsCount = agentsData.length;
+            const agents = Array.isArray(agentsData.data) ? agentsData.data : [];
+
+            // Same multi-endpoint approach as properties page
+            let allProperties = [];
+            const endpoints = [
+                `http://property.reworkstaging.name.ng/v1/properties`,
+                `http://property.reworkstaging.name.ng/v1/properties?merchant=${myId}`,
+                `http://property.reworkstaging.name.ng/v1/properties?verified=true`,
+                `http://property.reworkstaging.name.ng/v1/properties?verified=false`,
+            ];
+
+            for (const agent of agents) {
+                const agentId = agent.id || agent._id;
+                endpoints.push(`http://property.reworkstaging.name.ng/v1/properties?agent=${agentId}&verified=true`);
+                endpoints.push(`http://property.reworkstaging.name.ng/v1/properties?agent=${agentId}&verified=false`);
+                endpoints.push(`http://property.reworkstaging.name.ng/v1/properties?agent=${agentId}&merchant=${myId}`);
             }
 
-            const properties = propsData.data || [];
+            await Promise.all(endpoints.map(async (url) => {
+                try {
+                    const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+                    const data = await res.json();
+                    const list = data.data || data.properties || data.results || [];
+                    if (Array.isArray(list) && list.length > 0) {
+                        allProperties.push(...list);
+                    }
+                } catch {}
+            }));
+
+            // Get deleted property IDs from localStorage (same as properties page)
+            const deletedIds = JSON.parse(localStorage.getItem("deleted_properties") || "[]");
+            
+            const seen = new Set();
+            const unique = allProperties.filter(prop => {
+                const id = getId(prop);
+                if (!id || seen.has(id)) return false;
+                // Filter out deleted properties
+                if (deletedIds.includes(id)) return false;
+                seen.add(id);
+                return true;
+            });
+
             setStats({
                 users: usersData.data?.length || 0,
-                agents: agentsCount,
-                properties: properties.length,
-                pendingProperties: properties.filter(p => !p.is_verified).length,
+                agents: agents.length,
+                properties: unique.length,
+                pendingProperties: unique.filter(p => !p.is_verified).length,
                 appointments: aptData.data?.length || 0,
                 reviews: reviewsData.data?.length || 0
             });
+
         } catch (err) {
             console.error("Error fetching admin data:", err);
         } finally {
@@ -116,7 +152,7 @@ export default function AdminDashboard() {
         router.push("/admin/login");
     };
 
-    const updateAdminName = async (newName) => {
+    const updateAdminName = (newName) => {
         const userData = localStorage.getItem("user");
         if (!userData) return;
         const user = JSON.parse(userData);
@@ -126,12 +162,12 @@ export default function AdminDashboard() {
     };
 
     const statsCards = [
-        { title: "Total Users", value: stats.users, icon: UsersIcon, color: "blue", href: "/admin/users" },
-        { title: "Total Agents", value: stats.agents, icon: UserGroupIcon, color: "green", href: "/admin/agents" },
-        { title: "Properties", value: stats.properties, icon: BuildingOfficeIcon, color: "purple", href: "/admin/properties" },
-        { title: "Pending Verification", value: stats.pendingProperties, icon: ClockIcon, color: "yellow", href: "/admin/properties?filter=pending" },
-        { title: "Appointments", value: stats.appointments, icon: CalendarDaysIcon, color: "indigo", href: "/admin/appointments" },
-        { title: "Reviews", value: stats.reviews, icon: StarIcon, color: "pink", href: "/admin/reviews" }
+        { title: "Total Users", value: stats.users, icon: UsersIcon, href: "/admin/users" },
+        { title: "Total Agents", value: stats.agents, icon: UserGroupIcon, href: "/admin/agents" },
+        { title: "Properties", value: stats.properties, icon: BuildingOfficeIcon, href: "/admin/properties" },
+        { title: "Pending Verification", value: stats.pendingProperties, icon: ClockIcon, href: "/admin/properties?filter=pending" },
+        { title: "Appointments", value: stats.appointments, icon: CalendarDaysIcon, href: "/admin/appointments" },
+        { title: "Reviews", value: stats.reviews, icon: StarIcon, href: "/admin/reviews" }
     ];
 
     const quickActions = [
@@ -146,7 +182,7 @@ export default function AdminDashboard() {
         return (
             <div className="min-h-screen bg-gray-50 flex justify-center items-center">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4" />
                     <p className="text-gray-500">Loading dashboard...</p>
                 </div>
             </div>
@@ -155,10 +191,9 @@ export default function AdminDashboard() {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            {/* Hero Section */}
             <div className="relative overflow-hidden">
                 <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('https://images.pexels.com/photos/258154/pexels-photo-258154.jpeg?auto=compress&cs=tinysrgb&w=1600')" }}>
-                    <div className="absolute inset-0 bg-gradient-to-r from-red-900/85 via-red-800/75 to-rose-900/85"></div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-red-900/85 via-red-800/75 to-rose-900/85" />
                 </div>
                 <div className="relative max-w-7xl mx-auto px-4 py-8">
                     <div className="flex flex-wrap justify-between items-center gap-4">
@@ -170,14 +205,14 @@ export default function AdminDashboard() {
                                 <p className="text-red-200 text-sm">Welcome back,</p>
                                 {editingName ? (
                                     <div className="flex items-center gap-2 flex-wrap">
-                                        <input 
-                                            type="text" 
-                                            value={tempName} 
+                                        <input
+                                            type="text"
+                                            value={tempName}
                                             onChange={(e) => setTempName(e.target.value)}
                                             className="bg-white/20 rounded-lg px-3 py-1 text-white text-2xl font-bold outline-none focus:ring-2 focus:ring-white/50"
                                             autoFocus
                                         />
-                                        <button 
+                                        <button
                                             onClick={() => {
                                                 setAdminName(tempName);
                                                 setEditingName(false);
@@ -187,11 +222,8 @@ export default function AdminDashboard() {
                                         >
                                             <CheckIcon className="w-4 h-4" />
                                         </button>
-                                        <button 
-                                            onClick={() => {
-                                                setEditingName(false);
-                                                setTempName(adminName);
-                                            }}
+                                        <button
+                                            onClick={() => { setEditingName(false); setTempName(adminName); }}
                                             className="bg-gray-500 hover:bg-gray-600 text-white p-1.5 rounded-lg transition"
                                         >
                                             <XMarkIcon className="w-4 h-4" />
@@ -200,10 +232,9 @@ export default function AdminDashboard() {
                                 ) : (
                                     <div className="flex items-center gap-2">
                                         <h1 className="text-2xl font-bold text-white">{adminName}</h1>
-                                        <button 
+                                        <button
                                             onClick={() => setEditingName(true)}
                                             className="text-white/50 hover:text-white transition p-1"
-                                            title="Edit name"
                                         >
                                             <PencilIcon className="w-4 h-4" />
                                         </button>
@@ -221,13 +252,15 @@ export default function AdminDashboard() {
                                 <ArrowPathIcon className={`w-4 h-4 ${refreshing ? "animate-spin" : ""}`} />
                                 {refreshing ? "Refreshing..." : "Refresh"}
                             </button>
-                            <button onClick={handleLogout} className="flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur border border-white/20 text-white px-4 py-2 rounded-xl text-sm font-medium transition">
+                            <button
+                                onClick={handleLogout}
+                                className="flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur border border-white/20 text-white px-4 py-2 rounded-xl text-sm font-medium transition"
+                            >
                                 <ArrowRightOnRectangleIcon className="w-4 h-4" /> Logout
                             </button>
                         </div>
                     </div>
 
-                    {/* Stats Cards */}
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mt-8">
                         {statsCards.map((stat, idx) => {
                             const Icon = stat.icon;
@@ -247,9 +280,7 @@ export default function AdminDashboard() {
                 </div>
             </div>
 
-            {/* Main Content - Light Theme */}
             <div className="max-w-7xl mx-auto px-4 py-6">
-                {/* Quick Actions */}
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
                     {quickActions.map((action, idx) => {
                         const Icon = action.icon;
@@ -263,7 +294,6 @@ export default function AdminDashboard() {
                     })}
                 </div>
 
-                {/* Tabs */}
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 mb-6 overflow-hidden">
                     <div className="flex overflow-x-auto">
                         <button
@@ -281,7 +311,6 @@ export default function AdminDashboard() {
                     </div>
                 </div>
 
-                {/* Tab Content */}
                 {activeTab === "overview" && (
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
