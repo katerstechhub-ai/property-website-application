@@ -7,7 +7,6 @@ import {
     HomeIcon,
     BuildingOfficeIcon,
     UserGroupIcon,
-    IdentificationIcon,
     ChevronRightIcon,
     StarIcon,
     CheckCircleIcon,
@@ -16,6 +15,27 @@ import {
     ArrowTrendingUpIcon
 } from "@heroicons/react/24/outline";
 import { StarIcon as StarSolid } from "@heroicons/react/24/solid";
+
+// Color Palette (YOUR ORIGINAL COLORS - UNCHANGED)
+const COLORS = {
+    primary: '#6E473B',
+    secondary: '#BE85A9',
+    background: '#F5F0ED',
+    cardBg: '#FFFFFF',
+    textLight: '#A7807B',
+    textDark: '#291COE',
+    border: '#E1D4C2',
+    accent: '#6E473B'
+};
+
+// New text styles inspired by retro/vintage typography
+const retroText = {
+    heroHeading: "font-black uppercase tracking-tighter",
+    heroSub: "font-black uppercase tracking-wide",
+    sectionTitle: "font-black uppercase tracking-wide",
+    badge: "font-bold uppercase tracking-wider text-xs",
+    button: "font-black uppercase tracking-wide text-sm"
+};
 
 export default function PublicHome() {
     const [properties, setProperties] = useState([]);
@@ -201,140 +221,145 @@ export default function PublicHome() {
     ];
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen" style={{ backgroundColor: COLORS.background }}>
             {/* Hero Section */}
-            <div className="relative overflow-hidden text-white min-h-[650px] flex items-center">
+            <div className="relative overflow-hidden min-h-[650px] flex items-center">
                 {backgroundImages.map((img, idx) => (
                     <div key={idx} className={`absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-1000 ${currentBgIndex === idx ? "opacity-100" : "opacity-0"}`} style={{ backgroundImage: `url('${img}')` }} />
                 ))}
-                <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/80"></div>
+                <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.75) 50%, rgba(0,0,0,0.85) 100%)` }}></div>
                 <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-24 w-full">
                     <div className="grid md:grid-cols-2 gap-12 items-center">
                         <div className="text-left">
-                            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur rounded-full px-4 py-2 mb-6">
-                                <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                                <span className="text-sm">20,000+ properties available</span>
+                            <div className="inline-flex items-center gap-2 rounded-full px-4 py-2 mb-6" style={{ backgroundColor: `${COLORS.cardBg}20`, backdropFilter: 'blur(4px)' }}>
+                                <span className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: COLORS.secondary }}></span>
+                                <span className={`${retroText.badge} text-sm text-white`}>20,000+ properties available</span>
                             </div>
-                            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
-                                Not just a house.
+                            <h1 className={`${retroText.heroHeading} text-4xl md:text-5xl lg:text-6xl leading-[1.1] mb-6 text-white`}>
+                                NOT JUST A HOUSE.
                                 <br />
-                                <span className="text-blue-400">It's home.</span>
+                                <span className={retroText.heroSub} style={{ color: COLORS.secondary }}>IT'S HOME.</span>
                             </h1>
-                            <p className="text-lg text-gray-200 mb-8 max-w-lg">Skip the rental maze. We connect you directly to verified properties across Nigeria — no middlemen, no stress.</p>
-                            <div className="bg-white rounded-2xl p-2 shadow-2xl">
+                            <p className="text-lg mb-8 max-w-lg text-white/90">Skip the rental maze. We connect you directly to verified properties across Nigeria — no middlemen, no stress.</p>
+                            <div className="rounded-2xl p-2 shadow-2xl" style={{ backgroundColor: COLORS.cardBg }}>
                                 <div className="flex flex-col md:flex-row gap-2">
                                     <div className="flex-1 relative">
-                                        <MagnifyingGlassIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                        <input type="text" placeholder="Search by city, address, or property name..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-12 pr-5 py-4 text-gray-900 rounded-xl md:rounded-l-xl md:rounded-r-none focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                        <MagnifyingGlassIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: COLORS.textLight }} />
+                                        <input type="text" placeholder="Search by city, address, or property name..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-12 pr-5 py-4 rounded-xl md:rounded-l-xl md:rounded-r-none focus:outline-none focus:ring-2" style={{ color: COLORS.textDark, backgroundColor: COLORS.cardBg }} />
                                     </div>
                                     <div className="relative">
-                                        <MapPinIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                        <select value={selectedCity} onChange={(e) => setSelectedCity(e.target.value)} className="w-full md:w-44 pl-12 pr-5 py-4 text-gray-900 bg-gray-50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none">
+                                        <MapPinIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: COLORS.textLight }} />
+                                        <select value={selectedCity} onChange={(e) => setSelectedCity(e.target.value)} className="w-full md:w-44 pl-12 pr-5 py-4 rounded-xl focus:outline-none focus:ring-2 appearance-none" style={{ color: COLORS.textDark, backgroundColor: `${COLORS.primary}08` }}>
                                             {cities.map(city => (<option key={city} value={city}>{city}</option>))}
                                         </select>
                                     </div>
-                                    <button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-semibold transition duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
-                                        <MagnifyingGlassIcon className="w-5 h-5" /> Search
+                                    <button className={`${retroText.button} px-8 py-4 rounded-xl transition duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2`} style={{ backgroundColor: COLORS.primary, color: '#fff' }}>
+                                        <MagnifyingGlassIcon className="w-5 h-5" /> SEARCH
                                     </button>
                                 </div>
                             </div>
-                            <div className="flex flex-wrap gap-6 mt-6 text-sm text-gray-300">
-                                <div className="flex items-center gap-1"><CheckCircleIcon className="w-4 h-4 text-green-400" /> No hidden fees</div>
-                                <div className="flex items-center gap-1"><CheckCircleIcon className="w-4 h-4 text-green-400" /> Verified listings</div>
-                                <div className="flex items-center gap-1"><CheckCircleIcon className="w-4 h-4 text-green-400" /> 24/7 support</div>
+                            <div className="flex flex-wrap gap-6 mt-6 text-sm">
+                                <div className="flex items-center gap-1 text-white/80"><CheckCircleIcon className="w-4 h-4" style={{ color: COLORS.secondary }} /> No hidden fees</div>
+                                <div className="flex items-center gap-1 text-white/80"><CheckCircleIcon className="w-4 h-4" style={{ color: COLORS.secondary }} /> Verified listings</div>
+                                <div className="flex items-center gap-1 text-white/80"><CheckCircleIcon className="w-4 h-4" style={{ color: COLORS.secondary }} /> 24/7 support</div>
                             </div>
                         </div>
                         <div className="hidden md:block">
-                            <div className="bg-white/10 backdrop-blur rounded-2xl p-6 border border-white/20">
+                            <div className="rounded-2xl p-6" style={{ backgroundColor: `${COLORS.cardBg}20`, backdropFilter: 'blur(4px)', border: `1px solid ${COLORS.cardBg}30` }}>
                                 <div className="grid grid-cols-2 gap-4">
-                                    <div className="text-center"><p className="text-3xl font-bold text-blue-400">500+</p><p className="text-sm text-gray-300">Active listings</p></div>
-                                    <div className="text-center"><p className="text-3xl font-bold text-blue-400">50+</p><p className="text-sm text-gray-300">Trusted agents</p></div>
-                                    <div className="text-center"><p className="text-3xl font-bold text-blue-400">1000+</p><p className="text-sm text-gray-300">Happy renters</p></div>
-                                    <div className="text-center"><p className="text-3xl font-bold text-blue-400">20+</p><p className="text-sm text-gray-300">Cities covered</p></div>
+                                    <div className="text-center"><p className="text-3xl font-black" style={{ color: COLORS.secondary }}>500+</p><p className="text-sm text-white">Active listings</p></div>
+                                    <div className="text-center"><p className="text-3xl font-black" style={{ color: COLORS.secondary }}>50+</p><p className="text-sm text-white">Trusted agents</p></div>
+                                    <div className="text-center"><p className="text-3xl font-black" style={{ color: COLORS.secondary }}>1000+</p><p className="text-sm text-white">Happy renters</p></div>
+                                    <div className="text-center"><p className="text-3xl font-black" style={{ color: COLORS.secondary }}>20+</p><p className="text-sm text-white">Cities covered</p></div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
-                    {backgroundImages.map((_, idx) => (<button key={idx} onClick={() => setCurrentBgIndex(idx)} className={`w-2 h-2 rounded-full transition-all duration-300 ${currentBgIndex === idx ? "w-6 bg-white" : "bg-white/50"}`} />))}
+                    {backgroundImages.map((_, idx) => (<button key={idx} onClick={() => setCurrentBgIndex(idx)} className={`w-2 h-2 rounded-full transition-all duration-300 ${currentBgIndex === idx ? "w-6" : ""}`} style={{ backgroundColor: currentBgIndex === idx ? COLORS.cardBg : `${COLORS.cardBg}50` }} />))}
                 </div>
             </div>
 
             {/* Stats Section */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 relative z-10">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="bg-gradient-to-br from-white to-blue-50 rounded-xl p-5 text-center shadow-lg hover:shadow-xl transition group">
-                        <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:bg-blue-600 group-hover:scale-110 transition"><BuildingOfficeIcon className="w-6 h-6 text-blue-600 group-hover:text-white" /></div>
-                        <p className="text-2xl font-bold text-blue-600">500+</p><p className="text-gray-600 text-sm">Properties</p>
+                    <div className="rounded-xl p-5 text-center shadow-lg hover:shadow-xl transition group" style={{ backgroundColor: COLORS.cardBg }}>
+                        <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 transition" style={{ backgroundColor: COLORS.primary, color: '#fff' }}>
+                            <BuildingOfficeIcon className="w-6 h-6" />
+                        </div>
+                        <p className="text-2xl font-bold" style={{ color: COLORS.primary }}>500+</p>
+                        <p className="text-sm" style={{ color: COLORS.primary }}>Properties</p>
                     </div>
-                    <div className="bg-gradient-to-br from-white to-green-50 rounded-xl p-5 text-center shadow-lg hover:shadow-xl transition group">
-                        <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:bg-green-600 group-hover:scale-110 transition"><UserGroupIcon className="w-6 h-6 text-green-600 group-hover:text-white" /></div>
-                        <p className="text-2xl font-bold text-green-600">50+</p><p className="text-gray-600 text-sm">Agents</p>
+                    <div className="rounded-xl p-5 text-center shadow-lg hover:shadow-xl transition group" style={{ backgroundColor: COLORS.cardBg }}>
+                        <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 transition" style={{ backgroundColor: COLORS.secondary, color: '#fff' }}>
+                            <UserGroupIcon className="w-6 h-6" />
+                        </div>
+                        <p className="text-2xl font-bold" style={{ color: COLORS.secondary }}>50+</p>
+                        <p className="text-sm" style={{ color: COLORS.secondary }}>Agents</p>
                     </div>
-                    <div className="bg-gradient-to-br from-white to-yellow-50 rounded-xl p-5 text-center shadow-lg hover:shadow-xl transition group">
-                        <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:bg-yellow-600 group-hover:scale-110 transition"><StarSolid className="w-6 h-6 text-yellow-500 group-hover:text-white" /></div>
-                        <p className="text-2xl font-bold text-yellow-500">1000+</p><p className="text-gray-600 text-sm">Happy Clients</p>
+                    <div className="rounded-xl p-5 text-center shadow-lg hover:shadow-xl transition group" style={{ backgroundColor: COLORS.cardBg }}>
+                        <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 transition" style={{ backgroundColor: COLORS.primary, color: '#fff' }}>
+                            <StarSolid className="w-6 h-6" />
+                        </div>
+                        <p className="text-2xl font-bold" style={{ color: COLORS.primary }}>1000+</p>
+                        <p className="text-sm" style={{ color: COLORS.primary }}>Happy Clients</p>
                     </div>
-                    <div className="bg-gradient-to-br from-white to-purple-50 rounded-xl p-5 text-center shadow-lg hover:shadow-xl transition group">
-                        <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:bg-purple-600 group-hover:scale-110 transition"><MapPinIcon className="w-6 h-6 text-purple-600 group-hover:text-white" /></div>
-                        <p className="text-2xl font-bold text-purple-600">20+</p><p className="text-gray-600 text-sm">Cities</p>
+                    <div className="rounded-xl p-5 text-center shadow-lg hover:shadow-xl transition group" style={{ backgroundColor: COLORS.cardBg }}>
+                        <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 transition" style={{ backgroundColor: COLORS.secondary, color: '#fff' }}>
+                            <MapPinIcon className="w-6 h-6" />
+                        </div>
+                        <p className="text-2xl font-bold" style={{ color: COLORS.secondary }}>20+</p>
+                        <p className="text-sm" style={{ color: COLORS.secondary }}>Cities</p>
                     </div>
                 </div>
             </div>
 
             {/* Trust Badges Section */}
-            <div className="bg-gradient-to-r from-blue-900 to-indigo-900 text-white py-12 mt-12">
+            <div className="py-12 mt-12" style={{ backgroundColor: COLORS.background }}>
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-8">
-                        <h2 className="text-2xl font-bold mb-2">Trusted by Thousands</h2>
-                        <p className="text-blue-200">Join Nigeria's fastest-growing property platform</p>
+                        <h2 className={`${retroText.sectionTitle} text-2xl mb-2`} style={{ color: COLORS.primary }}>TRUSTED BY THOUSANDS</h2>
+                        <p style={{ color: COLORS.primary }}>Join Nigeria's fastest-growing property platform</p>
                     </div>
                     <div className="flex flex-wrap justify-center gap-8">
-                        <div className="flex items-center gap-2"><ShieldCheckIcon className="w-5 h-5 text-blue-300" /> 100% Verified Listings</div>
-                        <div className="flex items-center gap-2"><CheckCircleIcon className="w-5 h-5 text-blue-300" /> Instant Booking</div>
-                        <div className="flex items-center gap-2"><ArrowTrendingUpIcon className="w-5 h-5 text-blue-300" /> Best Prices Guaranteed</div>
-                        <div className="flex items-center gap-2"><ShieldCheckIcon className="w-5 h-5 text-blue-300" /> Legal Documentation</div>
+                        <div className="flex items-center gap-2" style={{ color: COLORS.primary }}>
+                            <ShieldCheckIcon className="w-5 h-5" style={{ color: COLORS.secondary }} /> 100% Verified Listings
+                        </div>
+                        <div className="flex items-center gap-2" style={{ color: COLORS.primary }}>
+                            <CheckCircleIcon className="w-5 h-5" style={{ color: COLORS.secondary }} /> Instant Booking
+                        </div>
+                        <div className="flex items-center gap-2" style={{ color: COLORS.primary }}>
+                            <ArrowTrendingUpIcon className="w-5 h-5" style={{ color: COLORS.secondary }} /> Best Prices Guaranteed
+                        </div>
+                        <div className="flex items-center gap-2" style={{ color: COLORS.primary }}>
+                            <ShieldCheckIcon className="w-5 h-5" style={{ color: COLORS.secondary }} /> Legal Documentation
+                        </div>
                     </div>
                 </div>
             </div>
 
-            {/* ─── HOW IT WORKS ─── */}
-            <div className="bg-white py-20">
+            {/* HOW IT WORKS */}
+            <div className="py-20" style={{ backgroundColor: COLORS.cardBg }}>
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    {/* Header */}
                     <div className="text-center mb-14">
-                        <div className="inline-flex items-center gap-2 bg-blue-100 rounded-full px-4 py-1 mb-4">
-                            <SparklesIcon className="w-4 h-4 text-blue-600" />
-                            <span className="text-sm text-blue-600 font-medium">Simple Process</span>
+                        <div className="inline-flex items-center gap-2 rounded-full px-4 py-1 mb-4" style={{ backgroundColor: `${COLORS.primary}10` }}>
+                            <SparklesIcon className="w-4 h-4" style={{ color: COLORS.primary }} />
+                            <span className={`${retroText.badge} text-sm font-medium`} style={{ color: COLORS.primary }}>SIMPLE PROCESS</span>
                         </div>
-                        <h2 className="text-3xl font-bold text-gray-900 mb-3">How It Works</h2>
-                        <p className="text-gray-500 max-w-xl mx-auto">Your journey to finding the perfect property in 4 easy steps</p>
+                        <h2 className={`${retroText.sectionTitle} text-3xl mb-3`} style={{ color: COLORS.textDark }}>HOW IT WORKS</h2>
+                        <p className="max-w-xl mx-auto" style={{ color: COLORS.textLight }}>Your journey to finding the perfect property in 4 easy steps</p>
                     </div>
 
-                    {/* Steps */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                         {steps.map((step, index) => (
                             <div key={index} className="group">
-                                {/* Image */}
-                                <div className="relative overflow-hidden  mb-5 shadow-md">
-                                    <img
-                                        src={step.image}
-                                        alt={step.title}
-                                        className="w-full h-52 object-cover "
-                                    />
-                                    {/* Step number badge */}
-                                    <div className="absolute top-4 left-4 w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center font-bold text-sm shadow-lg">
-                                        {step.number}
-                                    </div>
-                                    {/* Connector line (hidden on last) */}
-                                    {index < steps.length - 1 && (
-                                        <div className="hidden lg:block absolute top-1/2 -right-4 w-8 h-0.5 bg-blue-200 z-10" />
-                                    )}
+                                <div className="relative overflow-hidden mb-5 shadow-md rounded-2xl">
+                                    <img src={step.image} alt={step.title} className="w-full h-52 object-cover" />
+                                    <div className="absolute top-4 left-4 w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm shadow-lg" style={{ backgroundColor: COLORS.primary, color: '#fff' }}>{step.number}</div>
                                 </div>
-                                {/* Text */}
-                                <h3 className="text-lg font-bold text-gray-900 mb-1">{step.title}</h3>
-                                <p className="text-gray-500 text-sm leading-relaxed">{step.desc}</p>
+                                <h3 className={`${retroText.sectionTitle} text-lg mb-1`} style={{ color: COLORS.textDark }}>{step.title.toUpperCase()}</h3>
+                                <p className="text-sm leading-relaxed" style={{ color: COLORS.textLight }}>{step.desc}</p>
                             </div>
                         ))}
                     </div>
@@ -342,38 +367,40 @@ export default function PublicHome() {
             </div>
 
             {/* Premium Projects Section */}
-            <div className="bg-gray-50 py-20">
+            <div className="py-20" style={{ backgroundColor: COLORS.background }}>
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="grid md:grid-cols-2 gap-12 items-center">
-                        <div className="relative h-[500px] overflow-hidden shadow-xl">
+                        <div className="relative h-[500px] overflow-hidden shadow-xl rounded-2xl">
                             <img src="https://images.pexels.com/photos/280221/pexels-photo-280221.jpeg?auto=compress&cs=tinysrgb&w=1200" alt="Premium Project" className="w-full h-full object-cover" />
-                            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
-                                <p className="text-white text-sm">Premium Collection</p>
-                                <h3 className="text-white text-2xl font-bold">Luxury Living Redefined</h3>
+                            <div className="absolute bottom-0 left-0 right-0 p-6" style={{ background: `linear-gradient(to top, ${COLORS.textDark}dd, transparent)` }}>
+                                <p className={`${retroText.badge} text-sm`} style={{ color: COLORS.secondary }}>PREMIUM COLLECTION</p>
+                                <h3 className="text-2xl font-black text-white">LUXURY LIVING REDEFINED</h3>
                             </div>
                         </div>
                         <div>
                             <div className="mb-6">
-                                <p className="text-blue-600 text-sm font-semibold mb-2">FEATURED PROJECTS</p>
-                                <h2 className="text-3xl font-bold text-gray-900 mb-4">Experience Something Extra-Ordinary</h2>
+                                <p className={`${retroText.badge} text-sm font-semibold mb-2`} style={{ color: COLORS.primary }}>FEATURED PROJECTS</p>
+                                <h2 className={`${retroText.sectionTitle} text-3xl mb-4`} style={{ color: COLORS.textDark }}>EXPERIENCE SOMETHING EXTRA-ORDINARY</h2>
                                 <p className="text-gray-600">Paramount Twin Towers provide a unique blend of safe and secure community living that welcomes its residents to feel "at home".</p>
                             </div>
                             <div className="space-y-4">
                                 {projects.slice(0, 2).map((project, idx) => (
-                                    <div key={idx} className="flex gap-4 border-b border-gray-100 pb-4">
-                                        <div className="w-24 h-24 bg-gray-200 flex-shrink-0 overflow-hidden"><img src={project.image} alt={project.name} className="w-full h-full object-cover" /></div>
+                                    <div key={idx} className="flex gap-4 pb-4" style={{ borderBottom: `1px solid ${COLORS.border}` }}>
+                                        <div className="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0" style={{ backgroundColor: `${COLORS.primary}10` }}><img src={project.image} alt={project.name} className="w-full h-full object-cover" /></div>
                                         <div>
-                                            <h3 className="font-bold text-gray-900">{project.name}</h3>
-                                            <p className="text-sm text-gray-500">{project.location}</p>
-                                            <p className="text-blue-600 font-bold mt-1">{project.price}</p>
+                                            <h3 className="font-bold" style={{ color: COLORS.textDark }}>{project.name}</h3>
+                                            <p className="text-sm" style={{ color: COLORS.textLight }}>{project.location}</p>
+                                            <p className="font-bold mt-1" style={{ color: COLORS.primary }}>{project.price}</p>
                                             <div className="flex gap-3 mt-1">
-                                                <span className="text-xs text-gray-400">{project.unit}</span>
-                                                <span className="text-xs text-green-600">{project.status}</span>
+                                                <span className="text-xs" style={{ color: COLORS.textLight }}>{project.unit}</span>
+                                                <span className="text-xs" style={{ color: COLORS.secondary }}>{project.status}</span>
                                             </div>
                                         </div>
                                     </div>
                                 ))}
-                                <button className="text-blue-600 font-semibold mt-4 hover:text-blue-800 transition">VIEW ALL PROJECTS →</button>
+                                <Link href="/public/properties">
+                                    <button className={`${retroText.button} font-semibold mt-4 transition hover:opacity-70`} style={{ color: COLORS.primary }}>VIEW ALL PROJECTS →</button>
+                                </Link>
                             </div>
                         </div>
                     </div>
@@ -381,21 +408,21 @@ export default function PublicHome() {
             </div>
 
             {/* Our Projects Grid */}
-            <div className="bg-white py-20">
+            <div className="py-20" style={{ backgroundColor: COLORS.cardBg }}>
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-12">
-                        <p className="text-blue-600 text-sm font-semibold mb-2">OUR PORTFOLIO</p>
-                        <h2 className="text-3xl font-bold text-gray-900 mb-3">Our Projects</h2>
-                        <p className="text-gray-600 max-w-2xl mx-auto">Discover our signature developments across prime locations</p>
+                        <p className={`${retroText.badge} text-sm font-semibold mb-2`} style={{ color: COLORS.primary }}>OUR PORTFOLIO</p>
+                        <h2 className={`${retroText.sectionTitle} text-3xl mb-3`} style={{ color: COLORS.textDark }}>OUR PROJECTS</h2>
+                        <p className="max-w-2xl mx-auto" style={{ color: COLORS.textLight }}>Discover our signature developments across prime locations</p>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {projects.map((project, idx) => (
-                            <div key={idx} className="bg-white shadow-md overflow-hidden">
+                            <div key={idx} className="rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition" style={{ backgroundColor: COLORS.cardBg, border: `1px solid ${COLORS.border}` }}>
                                 <div className="h-64 overflow-hidden"><img src={project.image} alt={project.name} className="w-full h-full object-cover" /></div>
                                 <div className="p-5">
-                                    <h3 className="font-bold text-xl text-gray-900">{project.name}</h3>
-                                    <p className="text-gray-500 mt-1">{project.location}</p>
-                                    <p className="text-blue-600 font-bold text-lg mt-2">{project.price}</p>
+                                    <h3 className="font-bold text-xl" style={{ color: COLORS.textDark }}>{project.name}</h3>
+                                    <p className="mt-1" style={{ color: COLORS.textLight }}>{project.location}</p>
+                                    <p className="font-bold text-lg mt-2" style={{ color: COLORS.primary }}>{project.price}</p>
                                 </div>
                             </div>
                         ))}
@@ -406,31 +433,57 @@ export default function PublicHome() {
             {/* Filter Section */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                 <div className="flex flex-wrap gap-3 justify-center">
-                    {filters.map((filter) => (<button key={filter} onClick={() => setActiveFilter(filter)} className={`px-6 py-2 rounded-full font-medium transition-all duration-300 ${activeFilter === filter ? "bg-blue-600 text-white shadow-md" : "bg-white text-gray-700 hover:bg-gray-100"}`}>{filter}</button>))}
+                    {filters.map((filter) => (
+                        <button key={filter} onClick={() => setActiveFilter(filter)} 
+                            className={`${retroText.button} px-6 py-2 rounded-full font-medium transition-all duration-300 ${activeFilter === filter ? "text-white shadow-md" : ""}`} 
+                            style={activeFilter === filter ? { backgroundColor: COLORS.primary, color: '#fff' } : { backgroundColor: COLORS.cardBg, color: COLORS.textLight, border: `1px solid ${COLORS.border}` }}>
+                            {filter}
+                        </button>
+                    ))}
                 </div>
             </div>
 
             {/* Properties Grid */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-                {loading ? (<div className="flex justify-center items-center py-20"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>) : (
+                {loading ? (
+                    <div className="flex justify-center items-center py-20">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2" style={{ borderColor: COLORS.primary }}></div>
+                    </div>
+                ) : (
                     <>
                         <div className="flex justify-between items-center mb-6">
-                            <p className="text-gray-600">Found {filteredProperties.length} properties</p>
-                            <select className="border rounded-lg px-3 py-1 text-sm focus:ring-2 focus:ring-blue-500"><option>Sort by: Latest</option><option>Price: Low to High</option><option>Price: High to Low</option></select>
+                            <p className="text-sm" style={{ color: COLORS.textLight }}>Found {filteredProperties.length} properties</p>
+                            <select className="border rounded-lg px-3 py-1 text-sm focus:outline-none focus:ring-2" style={{ borderColor: COLORS.border, backgroundColor: COLORS.cardBg, color: COLORS.textDark }}>
+                                <option>Sort by: Latest</option>
+                                <option>Price: Low to High</option>
+                                <option>Price: High to Low</option>
+                            </select>
                         </div>
                         {filteredProperties.length === 0 ? (
-                            <div className="text-center py-20 bg-white rounded-2xl"><BuildingOfficeIcon className="w-20 h-20 text-gray-300 mx-auto mb-4" /><p className="text-gray-500 text-lg">No properties found</p><button onClick={() => { setSearchQuery(""); setSelectedCity(""); setActiveFilter("ALL"); }} className="text-blue-600 mt-2 hover:underline">Clear filters</button></div>
+                            <div className="text-center py-20 rounded-2xl" style={{ backgroundColor: COLORS.cardBg, border: `1px solid ${COLORS.border}` }}>
+                                <BuildingOfficeIcon className="w-20 h-20 mx-auto mb-4" style={{ color: COLORS.textLight }} />
+                                <p className="text-lg" style={{ color: COLORS.textDark }}>No properties found</p>
+                                <button onClick={() => { setSearchQuery(""); setSelectedCity(""); setActiveFilter("ALL"); }} className="mt-2 hover:underline" style={{ color: COLORS.primary }}>Clear filters</button>
+                            </div>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {filteredProperties.map((property) => (
                                     <Link href={`/public/properties/${property._id}`} key={property._id}>
-                                        <div className="bg-white shadow-md overflow-hidden hover:shadow-lg transition">
-                                            <div className="h-52 overflow-hidden bg-gray-200"><img src={property.images[0]} alt={property.name} className="w-full h-full object-cover" /></div>
+                                        <div className="rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition cursor-pointer" style={{ backgroundColor: COLORS.cardBg, border: `1px solid ${COLORS.border}` }}>
+                                            <div className="h-52 overflow-hidden" style={{ backgroundColor: `${COLORS.primary}10` }}>
+                                                <img src={property.images[0]} alt={property.name} className="w-full h-full object-cover" />
+                                            </div>
                                             <div className="p-5">
-                                                <h3 className="font-bold text-lg text-gray-900">{property.name}</h3>
-                                                <p className="text-gray-500 text-sm mt-1 flex items-center gap-1"><MapPinIcon className="w-3 h-3" /> {property.city}, {property.state}</p>
-                                                <p className="text-blue-600 font-bold text-xl mt-2">₦{parseInt(property.price).toLocaleString()}</p>
-                                                <div className="flex gap-4 text-sm text-gray-500 mt-3 pt-3 border-t"><span>{property.bedroom} beds</span><span>{property.bathroom} baths</span><span>{property.area}</span></div>
+                                                <h3 className="font-bold text-lg" style={{ color: COLORS.textDark }}>{property.name}</h3>
+                                                <p className="text-sm mt-1 flex items-center gap-1" style={{ color: COLORS.textLight }}>
+                                                    <MapPinIcon className="w-3 h-3" /> {property.city}, {property.state}
+                                                </p>
+                                                <p className="font-bold text-xl mt-2" style={{ color: COLORS.primary }}>₦{parseInt(property.price).toLocaleString()}</p>
+                                                <div className="flex gap-4 text-sm mt-3 pt-3" style={{ color: COLORS.textLight, borderTop: `1px solid ${COLORS.border}` }}>
+                                                    <span>{property.bedroom} beds</span>
+                                                    <span>{property.bathroom} baths</span>
+                                                    <span>{property.area}</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </Link>
@@ -443,19 +496,29 @@ export default function PublicHome() {
 
             {/* Testimonials Section */}
             <div className="relative py-20 overflow-hidden">
-                <div className="absolute inset-0 bg-cover bg-center bg-fixed" style={{ backgroundImage: "url('https://images.pexels.com/photos/1643389/pexels-photo-1643389.jpeg?auto=compress&cs=tinysrgb&w=1600')" }}><div className="absolute inset-0 bg-black/70"></div></div>
+                <div className="absolute inset-0 bg-cover bg-center bg-fixed" style={{ backgroundImage: "url('https://images.pexels.com/photos/1643389/pexels-photo-1643389.jpeg?auto=compress&cs=tinysrgb&w=1600')" }}>
+                    <div className="absolute inset-0" style={{ backgroundColor: `rgba(0,0,0,0.75)` }}></div>
+                </div>
                 <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-12">
-                        <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur rounded-full px-4 py-1 mb-4"><StarSolid className="w-4 h-4 text-yellow-400" /><span className="text-sm text-white font-medium">Client Stories</span></div>
-                        <h2 className="text-3xl font-bold text-white mb-3">What Our Clients Say</h2>
-                        <p className="text-gray-200">Real experiences from real people</p>
+                        <div className="inline-flex items-center gap-2 rounded-full px-4 py-1 mb-4" style={{ backgroundColor: `${COLORS.cardBg}20`, backdropFilter: 'blur(4px)' }}>
+                            <StarSolid className="w-4 h-4" style={{ color: COLORS.secondary }} />
+                            <span className={`${retroText.badge} text-sm text-white font-medium`}>CLIENT STORIES</span>
+                        </div>
+                        <h2 className="text-3xl font-black text-white mb-3">WHAT OUR CLIENTS SAY</h2>
+                        <p className="text-white/80">Real experiences from real people</p>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         {testimonials.map((testimonial, index) => (
-                            <div key={index} className="bg-white/10 backdrop-blur rounded-2xl p-6 hover:bg-white/20 transition">
-                                <div className="flex text-yellow-400 mb-3">{[...Array(testimonial.rating)].map((_, i) => (<StarSolid key={i} className="w-5 h-5" />))}</div>
-                                <p className="text-gray-200 mb-4 italic">"{testimonial.text}"</p>
-                                <div><p className="font-semibold text-white">{testimonial.name}</p><p className="text-sm text-gray-300">{testimonial.role}</p></div>
+                            <div key={index} className="rounded-2xl p-6 transition" style={{ backgroundColor: `${COLORS.cardBg}20`, backdropFilter: 'blur(4px)' }}>
+                                <div className="flex mb-3" style={{ color: COLORS.secondary }}>
+                                    {[...Array(testimonial.rating)].map((_, i) => (<StarSolid key={i} className="w-5 h-5" />))}
+                                </div>
+                                <p className="text-white/90 mb-4 italic">"{testimonial.text}"</p>
+                                <div>
+                                    <p className="font-semibold text-white">{testimonial.name}</p>
+                                    <p className="text-sm text-white/70">{testimonial.role}</p>
+                                </div>
                             </div>
                         ))}
                     </div>
@@ -463,28 +526,37 @@ export default function PublicHome() {
             </div>
 
             {/* CTA Section */}
-            <div className="relative overflow-hidden bg-gradient-to-r from-blue-900 to-indigo-700 text-white py-16">
-                <div className="absolute inset-0 opacity-10"><div className="absolute top-0 left-0 w-72 h-72 bg-white rounded-full -translate-x-1/2 -translate-y-1/2"></div><div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full translate-x-1/2 translate-y-1/2"></div></div>
+            <div className="relative overflow-hidden py-16" style={{ background: `linear-gradient(135deg, ${COLORS.textDark} 0%, ${COLORS.primary} 100%)` }}>
                 <div className="relative max-w-5xl mx-auto text-center px-4">
-                    <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to find your dream home?</h2>
-                    <p className="text-blue-100 mb-8 text-lg">Join thousands of happy homeowners who found their perfect property with us</p>
+                    <h2 className={`${retroText.sectionTitle} text-3xl md:text-4xl mb-4 text-white`}style={{  color: COLORS.primary }}>READY TO FIND YOUR DREAM HOME?</h2>
+                    <p className="mb-8 text-lg text-white/90"style={{  color: COLORS.primary }}>Join thousands of happy homeowners who found their perfect property with us</p>
                     <div className="flex flex-wrap gap-4 justify-center">
-                        <Link href="/tenant/register"><button className="bg-white text-blue-600 px-8 py-3 rounded-xl font-semibold hover:bg-gray-100 transition shadow-lg flex items-center gap-2">Get Started <ChevronRightIcon className="w-5 h-5" /></button></Link>
-                        <Link href="/agent/login"><button className="border-2 border-white text-white px-8 py-3 rounded-xl font-semibold hover:bg-white/10 transition">List Your Property</button></Link>
+                        <Link href="/tenant/register">
+                            <button className={`${retroText.button} px-8 py-3 rounded-xl font-semibold transition shadow-lg flex items-center gap-2`} style={{ backgroundColor: COLORS.cardBg, color: COLORS.primary }}>
+                                GET STARTED <ChevronRightIcon className="w-5 h-5" />
+                            </button>
+                        </Link>
+                        <Link href="/agent/login">
+                            <button className={`${retroText.button} border-2 px-8 py-3 rounded-xl font-semibold transition`} style={{ borderColor: COLORS.cardBg, color: COLORS.cardBg }}>
+                                LIST YOUR PROPERTY
+                            </button>
+                        </Link>
                     </div>
                 </div>
             </div>
 
             {/* Newsletter Section */}
-            <div className="bg-white py-16">
+            <div className="py-16" style={{ backgroundColor: COLORS.cardBg }}>
                 <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                    <h3 className="text-2xl font-bold text-gray-900 mb-3">Stay Updated</h3>
-                    <p className="text-gray-600 mb-6">Get the latest property listings and market news directly in your inbox</p>
+                    <h3 className="text-2xl font-bold mb-3" style={{ color: COLORS.textDark }}>Stay Updated</h3>
+                    <p className="mb-6" style={{ color: COLORS.textLight }}>Get the latest property listings and market news directly in your inbox</p>
                     <div className="flex flex-col sm:flex-row gap-4">
-                        <input type="email" placeholder="Enter your email address" className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" />
-                        <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition">Subscribe</button>
+                        <input type="email" placeholder="Enter your email address" className="flex-1 px-4 py-3 border rounded-xl focus:outline-none focus:ring-2" style={{ borderColor: COLORS.border, backgroundColor: COLORS.cardBg, color: COLORS.textDark }} />
+                        <button className={`${retroText.button} px-6 py-3 rounded-xl font-semibold transition`} style={{ backgroundColor: COLORS.primary, color: '#fff' }}>
+                            SUBSCRIBE
+                        </button>
                     </div>
-                    <p className="text-xs text-gray-400 mt-4">We respect your privacy. Unsubscribe at any time.</p>
+                    <p className="text-xs mt-4" style={{ color: COLORS.textLight }}>We respect your privacy. Unsubscribe at any time.</p>
                 </div>
             </div>
         </div>

@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { LockClosedIcon, EnvelopeIcon, ShieldCheckIcon, EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 
+const BASE = "http://property.reworkstaging.name.ng/v1";
+
 export default function AdminLogin() {
     const router = useRouter();
     const [email, setEmail] = useState("");
@@ -18,7 +20,7 @@ export default function AdminLogin() {
         setError("");
 
         try {
-            const res = await fetch("http://property.reworkstaging.name.ng/v1/auth/login", {
+            const res = await fetch(`${BASE}/auth/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password })
@@ -32,8 +34,27 @@ export default function AdminLogin() {
                     setLoading(false);
                     return;
                 }
-                localStorage.setItem("token", data.data.token);
+
+                const token = data.data.token;
+
+                // Save tokens and user
+                localStorage.setItem("token", token);
+                localStorage.setItem("admin_token", token); // used by public properties page
                 localStorage.setItem("user", JSON.stringify({ ...data.data }));
+
+                // Cache agents so the public properties page can query by agent
+                // without needing merchant-level auth on every visit
+                try {
+                    const agentsRes = await fetch(`${BASE}/merchants/agents`, {
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+                    const agentsData = await agentsRes.json();
+                    const agents = agentsData.data || agentsData.agents || [];
+                    if (agents.length > 0) {
+                        localStorage.setItem("cached_agents", JSON.stringify(agents));
+                    }
+                } catch {}
+
                 router.push("/admin");
             } else {
                 setError(data.msg || "Invalid email or password.");
