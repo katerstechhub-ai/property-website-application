@@ -99,8 +99,8 @@ function PropertyCard({ property, wishlistIds, onWishlist }) {
                         {property.type === "RENT" && <span className="text-xs font-normal ml-1" style={{ color: COLORS.textLight }}>/{property.payment_plan?.replace("PER_", "").toLowerCase() || "yr"}</span>}
                     </p>
                     <div className="flex items-center gap-3 text-xs pt-3" style={{ color: COLORS.textLight, borderTop: `1px solid ${COLORS.border}` }}>
-                        {property.bedroom > 0 && <span>🛏 {property.bedroom} Beds</span>}
-                        {property.bathroom > 0 && <span>🚿 {property.bathroom} Baths</span>}
+                        {property.bedroom > 0 && <span>{property.bedroom} Beds</span>}
+                        {property.bathroom > 0 && <span> {property.bathroom} Baths</span>}
                         {property.total_area && <span className="ml-auto font-medium">{property.total_area}</span>}
                     </div>
                 </div>
@@ -222,13 +222,88 @@ export default function PropertiesPage() {
             return 0;
         });
 
+    // Bottom section - will show always (even when no properties)
+    const bottomSection = (
+        <div className="mt-20">
+            {/* Decorative divider */}
+            <div className="flex items-center justify-center gap-4 mb-12">
+                <div className="h-px flex-1" style={{ backgroundColor: COLORS.border }}></div>
+                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS.primary }}></div>
+                <div className="h-px flex-1" style={{ backgroundColor: COLORS.border }}></div>
+            </div>
+
+            {/* Trust Indicators */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
+                <div className="text-center p-6 rounded-2xl transition-all duration-300 hover:-translate-y-1" style={{ backgroundColor: COLORS.cardBg, border: `1px solid ${COLORS.border}` }}>
+                    <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: `${COLORS.primary}10` }}>
+                        <FiShield className="w-7 h-7" style={{ color: COLORS.primary }} />
+                    </div>
+                    <h3 className={`${retroText.sectionTitle} text-sm mb-2`} style={{ color: COLORS.textDark }}>100% VERIFIED</h3>
+                    <p className="text-xs" style={{ color: COLORS.textLight }}>All properties thoroughly vetted</p>
+                </div>
+                <div className="text-center p-6 rounded-2xl transition-all duration-300 hover:-translate-y-1" style={{ backgroundColor: COLORS.cardBg, border: `1px solid ${COLORS.border}` }}>
+                    <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: `${COLORS.primary}10` }}>
+                        <FiUsers className="w-7 h-7" style={{ color: COLORS.primary }} />
+                    </div>
+                    <h3 className={`${retroText.sectionTitle} text-sm mb-2`} style={{ color: COLORS.textDark }}>TRUSTED AGENTS</h3>
+                    <p className="text-xs" style={{ color: COLORS.textLight }}>Licensed real estate professionals</p>
+                </div>
+                <div className="text-center p-6 rounded-2xl transition-all duration-300 hover:-translate-y-1" style={{ backgroundColor: COLORS.cardBg, border: `1px solid ${COLORS.border}` }}>
+                    <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: `${COLORS.primary}10` }}>
+                        <FiTrendingUp className="w-7 h-7" style={{ color: COLORS.primary }} />
+                    </div>
+                    <h3 className={`${retroText.sectionTitle} text-sm mb-2`} style={{ color: COLORS.textDark }}>BEST PRICES</h3>
+                    <p className="text-xs" style={{ color: COLORS.textLight }}>Competitive market rates guaranteed</p>
+                </div>
+                <div className="text-center p-6 rounded-2xl transition-all duration-300 hover:-translate-y-1" style={{ backgroundColor: COLORS.cardBg, border: `1px solid ${COLORS.border}` }}>
+                    <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: `${COLORS.primary}10` }}>
+                        <FiAward className="w-7 h-7" style={{ color: COLORS.primary }} />
+                    </div>
+                    <h3 className={`${retroText.sectionTitle} text-sm mb-2`} style={{ color: COLORS.textDark }}>24/7 SUPPORT</h3>
+                    <p className="text-xs" style={{ color: COLORS.textLight }}>Always here to help you</p>
+                </div>
+            </div>
+
+            {/* CTA Banner */}
+            <div className="relative rounded-3xl overflow-hidden">
+                <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('https://images.pexels.com/photos/1643389/pexels-photo-1643389.jpeg?auto=compress&cs=tinysrgb&w=1600')" }}>
+                    <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, ${COLORS.textDark}dd, ${COLORS.primary}cc)` }}></div>
+                </div>
+                <div className="relative p-12 text-center">
+                    <h2 className={`${retroText.sectionTitle} text-2xl md:text-3xl text-white mb-4`}>READY TO FIND YOUR DREAM HOME?</h2>
+                    <p className="text-white/90 mb-6 max-w-xl mx-auto">Join thousands of happy homeowners who found their perfect property with us</p>
+                    <Link href="/tenant/register">
+                        <button className={`${retroText.button} px-8 py-3 rounded-xl font-semibold transition shadow-lg inline-flex items-center gap-2 hover:scale-105`} style={{ backgroundColor: COLORS.cardBg, color: COLORS.primary }}>
+                            GET STARTED <FiTrendingUp className="w-4 h-4" />
+                        </button>
+                    </Link>
+                </div>
+            </div>
+
+            {/* Newsletter Section */}
+            <div className="mt-16 text-center">
+                <div className="max-w-2xl mx-auto">
+                    <h3 className={`${retroText.sectionTitle} text-xl mb-2`} style={{ color: COLORS.textDark }}>STAY UPDATED</h3>
+                    <p className="text-sm mb-6" style={{ color: COLORS.textLight }}>Get the latest property listings and market news directly in your inbox</p>
+                    <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+                        <input type="email" placeholder="Enter your email address" className="flex-1 px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 text-sm" style={{ borderColor: COLORS.border, backgroundColor: COLORS.cardBg, color: COLORS.textDark }} />
+                        <button className={`${retroText.button} px-6 py-3 rounded-xl font-semibold transition hover:opacity-80`} style={{ backgroundColor: COLORS.primary, color: '#fff' }}>
+                            SUBSCRIBE
+                        </button>
+                    </div>
+                    <p className="text-xs mt-4" style={{ color: COLORS.textLight }}>We respect your privacy. Unsubscribe at any time.</p>
+                </div>
+            </div>
+        </div>
+    );
+
     return (
         <div className="min-h-screen" style={{ backgroundColor: COLORS.background }}>
-            {/* Hero Section - Darker */}
-            <div className="relative h-[450px] bg-cover bg-center" style={{ backgroundImage: "url('https://images.pexels.com/photos/280229/pexels-photo-280229.jpeg?auto=compress&cs=tinysrgb&w=1600')" }}>
+            {/* Hero Section - Darker overlay for better contrast */}
+            <div className="relative h-[400px] bg-cover bg-center" style={{ backgroundImage: "url('https://images.pexels.com/photos/280229/pexels-photo-280229.jpeg?auto=compress&cs=tinysrgb&w=1600')" }}>
                 {/* Darker overlay for better text visibility */}
                 <div className="absolute inset-0" style={{
-                    background: `linear-gradient(135deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.85) 50%, rgba(0,0,0,0.9) 100%)`,
+                    background: `linear-gradient(135deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.65) 50%, rgba(0,0,0,0.75) 100%)`,
                 }} />
 
                 <div className="relative h-full flex flex-col items-center justify-center text-center px-4">
@@ -242,19 +317,19 @@ export default function PropertiesPage() {
                         Explore verified listings across Nigeria from trusted agents and developers
                     </p>
 
-                    {/* Search bar inside hero */}
-                    <div className="mt-8 w-full max-w-2xl">
-                        <div className="flex gap-2 p-2 rounded-full" style={{ backgroundColor: `${COLORS.cardBg}dd` }}>
+                    {/* Search Bar - Icon beside text */}
+                    <div className="mt-6 w-full max-w-lg">
+                        <div className="flex gap-2 p-1.5 rounded-full" style={{ backgroundColor: `${COLORS.cardBg}dd` }}>
                             <input
                                 type="text"
                                 placeholder="Search by city, property type or name..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="flex-1 px-6 py-3 bg-transparent rounded-full focus:outline-none"
+                                className="flex-1 px-5 py-2.5 bg-transparent rounded-full focus:outline-none text-sm"
                                 style={{ color: COLORS.textDark }}
                             />
-                            <button className={`${retroText.button} px-6 py-3 rounded-full font-semibold text-white transition hover:opacity-90`} style={{ backgroundColor: COLORS.primary }}>
-                                <FiSearch className="w-5 h-5" /> SEARCH
+                            <button className={`${retroText.button} px-5 py-2.5 rounded-full font-semibold text-white transition hover:opacity-90 flex items-center gap-2 text-sm`} style={{ backgroundColor: COLORS.primary }}>
+                                <FiSearch className="w-4 h-4" /> SEARCH
                             </button>
                         </div>
                     </div>
@@ -335,18 +410,22 @@ export default function PropertiesPage() {
                         ))}
                     </div>
                 ) : filtered.length === 0 ? (
-                    <div className="text-center py-20 rounded-2xl border" style={{ backgroundColor: COLORS.cardBg, borderColor: COLORS.border }}>
-                        <FiHome className="w-20 h-20 mx-auto mb-4" style={{ color: COLORS.textLight }} />
-                        <h3 className="text-lg font-semibold mb-2" style={{ color: COLORS.textDark }}>No properties found</h3>
-                        <p className="text-sm mb-4" style={{ color: COLORS.textLight }}>Try adjusting your search or filters</p>
-                        <button
-                            onClick={() => { setSearchQuery(""); setSelectedCity(""); setActiveFilter("ALL"); }}
-                            className={`${retroText.button} text-sm hover:underline font-medium`}
-                            style={{ color: COLORS.primary }}
-                        >
-                            CLEAR ALL FILTERS
-                        </button>
-                    </div>
+                    <>
+                        <div className="text-center py-20 rounded-2xl border" style={{ backgroundColor: COLORS.cardBg, borderColor: COLORS.border }}>
+                            <FiHome className="w-20 h-20 mx-auto mb-4" style={{ color: COLORS.textLight }} />
+                            <h3 className="text-lg font-semibold mb-2" style={{ color: COLORS.textDark }}>No properties found</h3>
+                            <p className="text-sm mb-4" style={{ color: COLORS.textLight }}>Try adjusting your search or filters</p>
+                            <button
+                                onClick={() => { setSearchQuery(""); setSelectedCity(""); setActiveFilter("ALL"); }}
+                                className={`${retroText.button} text-sm hover:underline font-medium`}
+                                style={{ color: COLORS.primary }}
+                            >
+                                CLEAR ALL FILTERS
+                            </button>
+                        </div>
+                        {/* Bottom section shows even when no properties */}
+                        {bottomSection}
+                    </>
                 ) : (
                     <>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -359,79 +438,7 @@ export default function PropertiesPage() {
                                 />
                             ))}
                         </div>
-
-                        {/* Beautiful Design Section Below Properties */}
-                        <div className="mt-20">
-                            {/* Decorative divider */}
-                            <div className="flex items-center justify-center gap-4 mb-12">
-                                <div className="h-px flex-1" style={{ backgroundColor: COLORS.border }}></div>
-                                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS.primary }}></div>
-                                <div className="h-px flex-1" style={{ backgroundColor: COLORS.border }}></div>
-                            </div>
-
-                            {/* Trust Indicators */}
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
-                                <div className="text-center p-6 rounded-2xl transition-all duration-300 hover:-translate-y-1" style={{ backgroundColor: COLORS.cardBg, border: `1px solid ${COLORS.border}` }}>
-                                    <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: `${COLORS.primary}10` }}>
-                                        <FiShield className="w-7 h-7" style={{ color: COLORS.primary }} />
-                                    </div>
-                                    <h3 className={`${retroText.sectionTitle} text-sm mb-2`} style={{ color: COLORS.textDark }}>100% VERIFIED</h3>
-                                    <p className="text-xs" style={{ color: COLORS.textLight }}>All properties thoroughly vetted</p>
-                                </div>
-                                <div className="text-center p-6 rounded-2xl transition-all duration-300 hover:-translate-y-1" style={{ backgroundColor: COLORS.cardBg, border: `1px solid ${COLORS.border}` }}>
-                                    <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: `${COLORS.primary}10` }}>
-                                        <FiUsers className="w-7 h-7" style={{ color: COLORS.primary }} />
-                                    </div>
-                                    <h3 className={`${retroText.sectionTitle} text-sm mb-2`} style={{ color: COLORS.textDark }}>TRUSTED AGENTS</h3>
-                                    <p className="text-xs" style={{ color: COLORS.textLight }}>Licensed real estate professionals</p>
-                                </div>
-                                <div className="text-center p-6 rounded-2xl transition-all duration-300 hover:-translate-y-1" style={{ backgroundColor: COLORS.cardBg, border: `1px solid ${COLORS.border}` }}>
-                                    <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: `${COLORS.primary}10` }}>
-                                        <FiTrendingUp className="w-7 h-7" style={{ color: COLORS.primary }} />
-                                    </div>
-                                    <h3 className={`${retroText.sectionTitle} text-sm mb-2`} style={{ color: COLORS.textDark }}>BEST PRICES</h3>
-                                    <p className="text-xs" style={{ color: COLORS.textLight }}>Competitive market rates guaranteed</p>
-                                </div>
-                                <div className="text-center p-6 rounded-2xl transition-all duration-300 hover:-translate-y-1" style={{ backgroundColor: COLORS.cardBg, border: `1px solid ${COLORS.border}` }}>
-                                    <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: `${COLORS.primary}10` }}>
-                                        <FiAward className="w-7 h-7" style={{ color: COLORS.primary }} />
-                                    </div>
-                                    <h3 className={`${retroText.sectionTitle} text-sm mb-2`} style={{ color: COLORS.textDark }}>24/7 SUPPORT</h3>
-                                    <p className="text-xs" style={{ color: COLORS.textLight }}>Always here to help you</p>
-                                </div>
-                            </div>
-
-                            {/* CTA Banner */}
-                            <div className="relative rounded-3xl overflow-hidden">
-                                <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('https://images.pexels.com/photos/1643389/pexels-photo-1643389.jpeg?auto=compress&cs=tinysrgb&w=1600')" }}>
-                                    <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, ${COLORS.textDark}dd, ${COLORS.primary}cc)` }}></div>
-                                </div>
-                                <div className="relative p-12 text-center">
-                                    <h2 className={`${retroText.sectionTitle} text-2xl md:text-3xl text-white mb-4`}>READY TO FIND YOUR DREAM HOME?</h2>
-                                    <p className="text-white/90 mb-6 max-w-xl mx-auto">Join thousands of happy homeowners who found their perfect property with us</p>
-                                    <Link href="/tenant/register">
-                                        <button className={`${retroText.button} px-8 py-3 rounded-xl font-semibold transition shadow-lg inline-flex items-center gap-2 hover:scale-105`} style={{ backgroundColor: COLORS.cardBg, color: COLORS.primary }}>
-                                            GET STARTED <FiTrendingUp className="w-4 h-4" />
-                                        </button>
-                                    </Link>
-                                </div>
-                            </div>
-
-                            {/* Newsletter Section */}
-                            <div className="mt-16 text-center">
-                                <div className="max-w-2xl mx-auto">
-                                    <h3 className={`${retroText.sectionTitle} text-xl mb-2`} style={{ color: COLORS.textDark }}>STAY UPDATED</h3>
-                                    <p className="text-sm mb-6" style={{ color: COLORS.textLight }}>Get the latest property listings and market news directly in your inbox</p>
-                                    <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-                                        <input type="email" placeholder="Enter your email address" className={`${retroText.body} flex-1 px-4 py-3 border rounded-xl focus:outline-none focus:ring-2`} style={{ borderColor: COLORS.border, backgroundColor: COLORS.cardBg, color: COLORS.textDark }} />
-                                        <button className={`${retroText.button} px-6 py-3 rounded-xl font-semibold transition hover:opacity-80`} style={{ backgroundColor: COLORS.primary, color: '#fff' }}>
-                                            SUBSCRIBE
-                                        </button>
-                                    </div>
-                                    <p className={`${retroText.caption} text-xs mt-4`} style={{ color: COLORS.textLight }}>We respect your privacy. Unsubscribe at any time.</p>
-                                </div>
-                            </div>
-                        </div>
+                        {bottomSection}
                     </>
                 )}
             </div>

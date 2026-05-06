@@ -5,7 +5,7 @@ import Link from "next/link";
 
 const BASE = "http://property.reworkstaging.name.ng/v1";
 
-// Custom Toast Component
+// Toast Component
 function Toast({ message, type, onClose }) {
     useEffect(() => {
         const timer = setTimeout(onClose, 4000);
@@ -35,18 +35,18 @@ function Toast({ message, type, onClose }) {
     );
 }
 
-// Color Palette from your image
+// Color Palette
 const COLORS = {
-  primary: '#6E473B',
-  secondary: '#BE85A9',
-  background: '#F5F0ED',
-  cardBg: '#FFFFFF',
-  textLight: '#A7807B',
-  textDark: '#291COE',
-  border: '#E1D4C2'
+    primary: '#6E473B',
+    secondary: '#BE85A9',
+    background: '#F5F0ED',
+    cardBg: '#FFFFFF',
+    textLight: '#A7807B',
+    textDark: '#291COE',
+    border: '#E1D4C2'
 };
 
-// SVG Icon Components
+// SVG Icons
 const IconMapPin = () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>;
 const IconBed = () => <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>;
 const IconBath = () => <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>;
@@ -63,6 +63,13 @@ const IconUser = () => <svg className="w-5 h-5" fill="none" stroke="currentColor
 const IconPhone = () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>;
 const IconMail = () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>;
 const IconHome = () => <svg className="w-24 h-24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>;
+
+// Format date YYYY-MM-DD → DD-MM-YYYY for API
+const formatDateForApi = (dateStr) => {
+    if (!dateStr) return "";
+    const [y, m, d] = dateStr.split("-");
+    return `${d}-${m}-${y}`;
+};
 
 function extractImageUrl(prop) {
     if (!prop) return null;
@@ -95,59 +102,56 @@ export default function PropertyDetailsPage() {
     const [error, setError] = useState("");
     const [showBooking, setShowBooking] = useState(false);
     const [bookingDate, setBookingDate] = useState("");
-    const [bookingTime, setBookingTime] = useState("");
+    const [bookingTime, setBookingTime] = useState("09:00");
     const [bookingMsg, setBookingMsg] = useState("");
     const [submitting, setSubmitting] = useState(false);
     const [user, setUser] = useState(null);
     const [isWishlist, setIsWishlist] = useState(false);
     const [toast, setToast] = useState(null);
 
-    const showToast = (message, type) => {
-        setToast({ message, type });
-        setTimeout(() => setToast(null), 4000);
-    };
+    const showToast = (message, type) => setToast({ message, type });
 
     useEffect(() => {
         const userData = localStorage.getItem("user");
-        if (userData) {
-            try { setUser(JSON.parse(userData)); } catch {}
-        }
-        if (id) {
-            fetchProperty();
-        }
+        if (userData) { try { setUser(JSON.parse(userData)); } catch { } }
+        if (id) fetchProperty();
     }, [id]);
 
     const fetchProperty = async () => {
+        setLoading(true);
+        setError("");
         try {
-            setLoading(true);
-            let token = localStorage.getItem("admin_token") || localStorage.getItem("token");
-            
-            if (!token) {
-                try {
-                    const tokenRes = await fetch(`${BASE}/token`, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ email: "d@g.com" })
-                    });
-                    const tokenData = await tokenRes.json();
-                    token = tokenData.token;
-                } catch (err) {
-                    console.error("Token fetch error:", err);
-                }
-            }
-            
-            const headers = token ? { "Authorization": `Bearer ${token}` } : {};
+            const token = localStorage.getItem("admin_token") || localStorage.getItem("token");
+            const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
             const res = await fetch(`${BASE}/properties/${id}`, { headers });
-            
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            
             const data = await res.json();
-            const propertyData = data.data || data;
-            
-            if (propertyData && (propertyData._id || propertyData.id)) {
-                setProperty(propertyData);
+            const prop = data.data || data;
+            if (prop && (prop._id || prop.id)) {
+                setProperty(prop);
             } else {
                 setError("Property not found");
+            }
+
+            // Check wishlist status
+            const userData = localStorage.getItem("user");
+            const userToken = localStorage.getItem("token");
+            if (userData && userToken) {
+                try {
+                    const u = JSON.parse(userData);
+                    const userId = u._id || u.id;
+                    const wRes = await fetch(`${BASE}/users/${userId}/wishlist`, {
+                        headers: { Authorization: `Bearer ${userToken}` }
+                    });
+                    const wData = await wRes.json();
+                    const inList = (wData.data || []).some(w =>
+                        (w.property_id || w._id || w.id) === id
+                    );
+                    setIsWishlist(inList);
+                } catch (err) {
+                    console.error("Wishlist check error:", err);
+                }
             }
         } catch (err) {
             console.error("Error:", err);
@@ -159,16 +163,44 @@ export default function PropertyDetailsPage() {
 
     const handleBooking = async (e) => {
         e.preventDefault();
-        
+
         if (!user) {
             showToast("Please login to book a viewing", "error");
             router.push("/tenant/login");
             return;
         }
-        
+
+        if (!bookingDate) {
+            showToast("Please select a date", "error");
+            return;
+        }
+
         setSubmitting(true);
         const token = localStorage.getItem("token");
-        
+
+        if (!token) {
+            showToast("Please login again", "error");
+            setSubmitting(false);
+            router.push("/tenant/login");
+            return;
+        }
+
+        // Get agent_id if available
+        const agentId = property?.agent?._id || property?.agent?.id ||
+            (typeof property?.agent === "string" ? property.agent : undefined);
+
+        const appointmentData = {
+            property_id: property._id || property.id,
+            user_id: user._id || user.id,
+            date: formatDateForApi(bookingDate),
+            msg: bookingMsg,
+            time: {
+                from: bookingTime + " AM",
+                to: (parseInt(bookingTime) + 2) + ":00 PM"
+            },
+            ...(agentId && { agent_id: agentId }),
+        };
+
         try {
             const res = await fetch(`${BASE}/appointments`, {
                 method: "POST",
@@ -176,39 +208,77 @@ export default function PropertyDetailsPage() {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}`
                 },
-                body: JSON.stringify({
-                    property_id: property._id,
-                    user_id: user._id || user.id,
-                    date: bookingDate,
-                    msg: bookingMsg,
-                    time: { from: bookingTime || "10:00", to: "12:00" }
-                })
+                body: JSON.stringify(appointmentData)
             });
-            
-            if (res.ok) {
+            const data = await res.json();
+
+            if (res.ok || data.code === 200 || data.status === "success") {
                 showToast("Appointment booked successfully!", "success");
                 setShowBooking(false);
                 setBookingDate("");
-                setBookingTime("");
+                setBookingTime("09:00");
                 setBookingMsg("");
             } else {
-                showToast("Failed to book appointment", "error");
+                showToast(data.message || data.msg || "Failed to book appointment", "error");
             }
         } catch (err) {
-            showToast("Error booking appointment", "error");
+            console.error("Booking error:", err);
+            showToast("Network error. Please try again.", "error");
         } finally {
             setSubmitting(false);
         }
     };
 
-    const toggleWishlist = () => {
+    const toggleWishlist = async () => {
         if (!user) {
             showToast("Please login to add to wishlist", "error");
             router.push("/tenant/login");
             return;
         }
-        setIsWishlist(!isWishlist);
-        showToast(isWishlist ? "Removed from wishlist" : "Added to wishlist", "success");
+
+        const token = localStorage.getItem("token");
+        const userId = user._id || user.id;
+
+        if (isWishlist) {
+            // Remove from wishlist
+            try {
+                const res = await fetch(`${BASE}/users/${userId}/wishlist/${id}`, {
+                    method: "DELETE",
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    setIsWishlist(false);
+                    showToast("Removed from wishlist", "success");
+                } else {
+                    showToast("Failed to remove from wishlist", "error");
+                }
+            } catch (err) {
+                showToast("Network error", "error");
+            }
+        } else {
+            // Add to wishlist
+            try {
+                const res = await fetch(`${BASE}/users/wishlist`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        property_id: id,
+                        user_id: userId
+                    })
+                });
+                if (res.ok) {
+                    setIsWishlist(true);
+                    showToast("Added to wishlist!", "success");
+                } else {
+                    showToast("Failed to add to wishlist", "error");
+                }
+            } catch (err) {
+                showToast("Network error", "error");
+            }
+        }
     };
 
     const shareProperty = () => {
@@ -231,9 +301,7 @@ export default function PropertyDetailsPage() {
         return (
             <div className="min-h-screen flex justify-center items-center" style={{ backgroundColor: COLORS.background }}>
                 <div className="text-center p-8 rounded-2xl" style={{ backgroundColor: COLORS.cardBg, border: `1px solid ${COLORS.border}` }}>
-                    <svg className="w-16 h-16 mx-auto mb-4" fill="none" stroke={COLORS.primary} viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+                    <p className="text-5xl mb-4">🏠</p>
                     <h2 className="text-2xl font-bold mb-4" style={{ color: COLORS.textDark }}>Property Not Found</h2>
                     <p className="mb-6" style={{ color: COLORS.textLight }}>{error || "The property you're looking for doesn't exist."}</p>
                     <Link href="/public/properties">
@@ -249,11 +317,13 @@ export default function PropertyDetailsPage() {
     const imageUrl = extractImageUrl(property);
     const price = parseInt(String(property.price || "0").replace(/,/g, ""));
     const avgRating = 4.8;
+    const agentName = property.agent?.full_name || property.agent?.name ||
+        (typeof property.agent === "string" ? "Professional Agent" : "Professional Agent");
 
     return (
         <div className="min-h-screen py-8" style={{ backgroundColor: COLORS.background }}>
             {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
-            
+
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Top Navigation */}
                 <div className="flex justify-between items-center mb-6">
@@ -262,10 +332,10 @@ export default function PropertyDetailsPage() {
                         <span>Back to Properties</span>
                     </Link>
                     <div className="flex gap-3">
-                        <button onClick={shareProperty} className="p-2 rounded-full transition hover:bg-opacity-10" style={{ backgroundColor: `${COLORS.primary}10`, color: COLORS.primary }}>
+                        <button onClick={shareProperty} className="p-2 rounded-full transition" style={{ backgroundColor: `${COLORS.primary}15`, color: COLORS.primary }}>
                             <IconShare />
                         </button>
-                        <button onClick={toggleWishlist} className="p-2 rounded-full transition hover:bg-opacity-10" style={{ backgroundColor: `${COLORS.primary}10`, color: COLORS.primary }}>
+                        <button onClick={toggleWishlist} className="p-2 rounded-full transition" style={{ backgroundColor: `${COLORS.primary}15`, color: COLORS.primary }}>
                             {isWishlist ? <IconHeartSolid /> : <IconHeart />}
                         </button>
                     </div>
@@ -290,7 +360,7 @@ export default function PropertyDetailsPage() {
                         {/* Property Info Card */}
                         <div className="rounded-2xl p-6 shadow-lg" style={{ backgroundColor: COLORS.cardBg }}>
                             <h1 className="text-3xl font-bold mb-2" style={{ color: COLORS.textDark }}>{property.name}</h1>
-                            
+
                             <div className="flex items-center gap-4 mb-4">
                                 <div className="flex items-center gap-1" style={{ color: COLORS.textLight }}>
                                     <IconMapPin />
@@ -303,7 +373,7 @@ export default function PropertyDetailsPage() {
                                     <span className="text-sm ml-1" style={{ color: COLORS.textDark }}>{avgRating}</span>
                                 </div>
                             </div>
-                            
+
                             <div className="mb-6">
                                 <p className="text-3xl font-bold" style={{ color: COLORS.primary }}>
                                     ₦{isNaN(price) ? property.price : price.toLocaleString()}
@@ -361,6 +431,9 @@ export default function PropertyDetailsPage() {
                                 <div className="mb-8">
                                     <h2 className="text-xl font-semibold mb-3" style={{ color: COLORS.textDark }}>Description</h2>
                                     <p className="leading-relaxed" style={{ color: COLORS.textLight }}>{property.description}</p>
+                                    {property.disclaimer && (
+                                        <p className="mt-3 text-sm italic" style={{ color: COLORS.textLight }}>ℹ️ {property.disclaimer}</p>
+                                    )}
                                 </div>
                             )}
 
@@ -381,102 +454,124 @@ export default function PropertyDetailsPage() {
                         </div>
                     </div>
 
-                    {/* Right Column - Booking Sidebar */}
+                    {/* Right Column - Booking Sidebar (NO STICKY - scrolls normally) */}
                     <div className="lg:col-span-1">
-                        <div className="sticky top-24 rounded-2xl p-6 shadow-lg" style={{ backgroundColor: COLORS.cardBg }}>
-                            <h3 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: COLORS.textDark }}>
-                                <IconCalendar />
-                                Schedule a Viewing
-                            </h3>
-                            
-                            {!showBooking ? (
-                                <div className="space-y-4">
-                                    <div className="p-4 rounded-xl" style={{ backgroundColor: `${COLORS.primary}05` }}>
-                                        <p className="flex items-center gap-2 text-sm mb-2" style={{ color: COLORS.textDark }}>
-                                            <IconCheck /> Free consultation
-                                        </p>
-                                        <p className="flex items-center gap-2 text-sm mb-2" style={{ color: COLORS.textDark }}>
-                                            <IconCheck /> Flexible viewing times
-                                        </p>
-                                        <p className="flex items-center gap-2 text-sm" style={{ color: COLORS.textDark }}>
-                                            <IconCheck /> No obligation
-                                        </p>
-                                    </div>
-                                    
-                                    <button 
-                                        onClick={() => setShowBooking(true)}
-                                        className="w-full py-3 rounded-xl font-semibold transition hover:opacity-90"
-                                        style={{ backgroundColor: COLORS.primary, color: '#fff' }}
-                                    >
-                                        Book Appointment
-                                    </button>
-                                </div>
-                            ) : (
-                                <form onSubmit={handleBooking} className="space-y-4">
-                                    <div>
-                                        <label className="block text-sm font-medium mb-1" style={{ color: COLORS.textDark }}>Select Date</label>
-                                        <input 
-                                            type="date" 
-                                            required 
-                                            value={bookingDate}
-                                            onChange={(e) => setBookingDate(e.target.value)}
-                                            className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2"
-                                            style={{ borderColor: COLORS.border, backgroundColor: COLORS.cardBg, color: COLORS.textDark }}
-                                            min={new Date().toISOString().split("T")[0]}
-                                        />
-                                    </div>
-                                    
-                                    <div>
-                                        <label className="block text-sm font-medium mb-1" style={{ color: COLORS.textDark }}>Preferred Time</label>
-                                        <select 
-                                            value={bookingTime}
-                                            onChange={(e) => setBookingTime(e.target.value)}
-                                            className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2"
-                                            style={{ borderColor: COLORS.border, backgroundColor: COLORS.cardBg, color: COLORS.textDark }}
-                                        >
-                                            <option value="">Select time</option>
-                                            <option value="09:00">9:00 AM</option>
-                                            <option value="11:00">11:00 AM</option>
-                                            <option value="14:00">2:00 PM</option>
-                                            <option value="16:00">4:00 PM</option>
-                                        </select>
-                                    </div>
-                                    
-                                    <div>
-                                        <label className="block text-sm font-medium mb-1" style={{ color: COLORS.textDark }}>Additional Notes</label>
-                                        <textarea 
-                                            value={bookingMsg}
-                                            onChange={(e) => setBookingMsg(e.target.value)}
-                                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2"
-                                            rows="3"
-                                            placeholder="Any questions or special requests?"
-                                            style={{ borderColor: COLORS.border, backgroundColor: COLORS.cardBg, color: COLORS.textDark }}
-                                        />
-                                    </div>
-                                    
-                                    <div className="flex gap-3 pt-2">
-                                        <button 
-                                            type="button" 
-                                            onClick={() => setShowBooking(false)}
-                                            className="flex-1 py-2 rounded-lg font-semibold transition hover:bg-opacity-10"
-                                            style={{ backgroundColor: `${COLORS.primary}10`, color: COLORS.primary }}
-                                        >
-                                            Cancel
-                                        </button>
-                                        <button 
-                                            type="submit" 
-                                            disabled={submitting}
-                                            className="flex-1 py-2 rounded-lg font-semibold transition hover:opacity-90 disabled:opacity-50"
+                        {/* Booking Card */}
+                        <div className="rounded-2xl overflow-hidden shadow-lg" style={{ backgroundColor: COLORS.cardBg }}>
+                            {/* Card Header */}
+                            <div className="p-5" style={{ backgroundColor: COLORS.primary }}>
+                                <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                                    <IconCalendar />
+                                    Schedule a Viewing
+                                </h3>
+                                <p className="text-white/80 text-sm mt-1">Book a time to see this property</p>
+                            </div>
+
+                            <div className="p-6">
+                                {!showBooking ? (
+                                    <div className="space-y-5">
+                                        <div className="space-y-3">
+                                            {["Free consultation with no obligation", "Flexible viewing times that suit you", "Get answers to all your questions"].map((text) => (
+                                                <div key={text} className="flex items-center gap-3 text-sm" style={{ color: COLORS.textDark }}>
+                                                    <div className="w-6 h-6 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: `${COLORS.primary}10` }}>
+                                                        <IconCheck className="w-3 h-3" style={{ color: COLORS.primary }} />
+                                                    </div>
+                                                    <span>{text}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                        <button
+                                            onClick={() => user ? setShowBooking(true) : router.push("/tenant/login")}
+                                            className="w-full py-3.5 rounded-xl font-semibold transition-all duration-200 hover:opacity-90 shadow-md"
                                             style={{ backgroundColor: COLORS.primary, color: '#fff' }}
                                         >
-                                            {submitting ? "Booking..." : "Confirm"}
+                                            {user ? "Book an Appointment" : "Login to Book"}
                                         </button>
+                                        {!user && (
+                                            <p className="text-center text-xs" style={{ color: COLORS.textLight }}>
+                                                <Link href="/tenant/login" className="underline" style={{ color: COLORS.primary }}>Login</Link>
+                                                {" or "}
+                                                <Link href="/tenant/register" className="underline" style={{ color: COLORS.primary }}>Register</Link>
+                                            </p>
+                                        )}
                                     </div>
-                                </form>
-                            )}
+                                ) : (
+                                    <form onSubmit={handleBooking} className="space-y-4">
+                                        <div>
+                                            <label className="block text-sm font-medium mb-1.5" style={{ color: COLORS.textDark }}>
+                                                📅 Select Date
+                                            </label>
+                                            <input
+                                                type="date"
+                                                required
+                                                value={bookingDate}
+                                                onChange={(e) => setBookingDate(e.target.value)}
+                                                className="w-full px-4 py-3 rounded-xl border focus:outline-none transition"
+                                                style={{ borderColor: COLORS.border, backgroundColor: COLORS.background, color: COLORS.textDark }}
+                                                min={new Date().toISOString().split("T")[0]}
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium mb-1.5" style={{ color: COLORS.textDark }}>
+                                                ⏰ Preferred Time
+                                            </label>
+                                            <div className="grid grid-cols-2 gap-2">
+                                                {["09:00", "11:00", "14:00", "16:00"].map((time) => (
+                                                    <button
+                                                        key={time}
+                                                        type="button"
+                                                        onClick={() => setBookingTime(time)}
+                                                        className="px-3 py-2 rounded-xl text-sm font-medium transition"
+                                                        style={bookingTime === time
+                                                            ? { backgroundColor: COLORS.primary, color: '#fff' }
+                                                            : { borderColor: COLORS.border, backgroundColor: COLORS.cardBg, color: COLORS.textDark, border: `1px solid ${COLORS.border}` }
+                                                        }
+                                                    >
+                                                        {time}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium mb-1.5" style={{ color: COLORS.textDark }}>
+                                                💬 Notes (Optional)
+                                            </label>
+                                            <textarea
+                                                value={bookingMsg}
+                                                onChange={(e) => setBookingMsg(e.target.value)}
+                                                className="w-full px-4 py-3 border rounded-xl focus:outline-none transition resize-none"
+                                                rows="2"
+                                                placeholder="Any questions or special requests?"
+                                                style={{ borderColor: COLORS.border, backgroundColor: COLORS.background, color: COLORS.textDark }}
+                                            />
+                                        </div>
+
+                                        <div className="flex gap-3 pt-2">
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowBooking(false)}
+                                                className="flex-1 py-3 rounded-xl font-medium transition"
+                                                style={{ backgroundColor: `${COLORS.primary}10`, color: COLORS.primary }}
+                                            >
+                                                Cancel
+                                            </button>
+                                            <button
+                                                type="submit"
+                                                disabled={submitting}
+                                                className="flex-1 py-3 rounded-xl font-semibold transition disabled:opacity-50"
+                                                style={{ backgroundColor: COLORS.primary, color: '#fff' }}
+                                            >
+                                                {submitting ? "Booking..." : "Confirm Booking"}
+                                            </button>
+                                        </div>
+                                    </form>
+                                )}
+                            </div>
                         </div>
 
-                        {/* Agent Contact Card */}
+                        {/* Agent Contact Card - scrolls normally */}
                         <div className="mt-6 rounded-2xl p-6 shadow-lg" style={{ backgroundColor: COLORS.cardBg }}>
                             <h3 className="text-lg font-bold mb-4 flex items-center gap-2" style={{ color: COLORS.textDark }}>
                                 <IconUser />
